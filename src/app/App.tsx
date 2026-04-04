@@ -196,39 +196,52 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-border">
+      <header className="glass-card sticky top-0 z-40 border-b border-border">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-6 h-6 text-white" />
+            <motion.div 
+              className="flex items-center gap-3"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="relative">
+                <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-glow">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+                <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl blur opacity-30 -z-10"></div>
               </div>
               <div>
-                <h1 className="font-bold text-xl">
-                  SupplySense AI
+                <h1 className="font-bold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                  LogiSmart
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Predictive Supply Chain Intelligence
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <motion.div 
+              className="flex items-center gap-4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
                 <span className="text-sm font-medium">
                   All Systems Operational
                 </span>
               </div>
-              <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Bell className="w-5 h-5" />
+              <button className="relative p-2.5 glass-card rounded-xl hover:shadow-glow transition-all duration-300 group">
+                <Bell className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                 {alerts.length > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-r from-red-500 to-rose-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
                 )}
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
       </header>
@@ -240,7 +253,7 @@ export default function App() {
       />
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-border">
+      <div className="glass border-b border-border/50">
         <div className="max-w-[1600px] mx-auto px-6">
           <div className="flex gap-1">
             {[
@@ -264,21 +277,34 @@ export default function App() {
                 label: "Analytics",
                 icon: BarChart3,
               },
-            ].map((tab) => {
+            ].map((tab, index) => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
-                <button
+                <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? "border-primary text-primary font-medium"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  className={`relative flex items-center gap-2 px-5 py-3.5 transition-all duration-300 ${
+                    isActive
+                      ? "text-primary font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
                   {tab.label}
-                </button>
+                  {isActive && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                      layoutId="activeTab"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                </motion.button>
               );
             })}
           </div>
@@ -286,16 +312,21 @@ export default function App() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-[1600px] mx-auto px-6 py-6">
+      <main className="max-w-[1600px] mx-auto px-6 py-8">
         {activeTab === "overview" && (
-          <div className="grid grid-cols-3 gap-6">
+          <motion.div 
+            className="grid grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
             {/* Left Column - Shipment List */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-medium">
+                <h2 className="font-semibold text-lg bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                   Active Shipments
                 </h2>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground px-3 py-1 glass-card rounded-lg">
                   {shipments.length} total
                 </span>
               </div>
@@ -307,7 +338,7 @@ export default function App() {
 
             {/* Middle & Right Columns - Map */}
             <div className="col-span-2">
-              <h2 className="font-medium mb-4">
+              <h2 className="font-semibold text-lg mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                 Real-Time Tracking
               </h2>
               <div className="h-[700px]">
@@ -322,83 +353,107 @@ export default function App() {
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === "predictions" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="font-medium">
+                <h2 className="font-semibold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                   Delay Predictions
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mt-1">
                   AI-powered predictions based on real-time data
                 </p>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 text-amber-700 rounded-lg">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-500/20">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm font-medium">
+                <span className="text-sm font-semibold">
                   {delayPredictions.length} Shipments at Risk
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              {delayPredictions.map((prediction) => (
-                <DelayPredictionCard
+            <div className="grid grid-cols-3 gap-6">
+              {delayPredictions.map((prediction, index) => (
+                <motion.div
                   key={prediction.shipmentId}
-                  prediction={prediction}
-                  onViewDetails={handleShipmentClick}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <DelayPredictionCard
+                    prediction={prediction}
+                    onViewDetails={handleShipmentClick}
+                  />
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === "routes" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="font-medium">
+                <h2 className="font-semibold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                   Smart Route Optimization
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mt-1">
                   Dynamic route suggestions to minimize delays
                 </p>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20 shadow-glow-success">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-medium">
+                <span className="text-sm font-semibold">
                   Avg 22 min savings per route
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              {routeOptimizations.map((optimization) => (
-                <RouteOptimizationCard
+              {routeOptimizations.map((optimization, index) => (
+                <motion.div
                   key={optimization.shipmentId}
-                  {...optimization}
-                  onApplyRoute={handleApplyRoute}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.15 }}
+                >
+                  <RouteOptimizationCard
+                    {...optimization}
+                    onApplyRoute={handleApplyRoute}
+                  />
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === "analytics" && (
-          <div>
-            <div className="mb-6">
-              <h2 className="font-medium">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="mb-8">
+              <h2 className="font-semibold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                 Performance Analytics
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-1">
                 Insights and trends across your supply chain
               </p>
             </div>
             <AnalyticsDashboard />
-          </div>
+          </motion.div>
         )}
       </main>
     </div>

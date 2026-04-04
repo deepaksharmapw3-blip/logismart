@@ -26,34 +26,36 @@ export function RouteOptimizationCard({
   const getTrafficColor = (level: Route['trafficLevel']) => {
     switch (level) {
       case 'low':
-        return 'text-emerald-600 bg-emerald-100';
+        return 'text-emerald-600 dark:text-emerald-400 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20';
       case 'medium':
-        return 'text-amber-600 bg-amber-100';
+        return 'text-amber-600 dark:text-amber-400 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20';
       case 'high':
-        return 'text-red-600 bg-red-100';
+        return 'text-red-600 dark:text-red-400 bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-500/20';
     }
   };
 
   const RouteCard = ({ route, type }: { route: Route; type: 'current' | 'suggested' }) => (
     <div
-      className={`p-4 rounded-lg border-2 ${
+      className={`p-5 rounded-2xl border transition-all duration-300 ${
         type === 'suggested'
-          ? 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-300'
-          : 'bg-white border-gray-200'
+          ? 'glass-card border-emerald-500/30 shadow-glow-success bg-gradient-to-br from-emerald-500/5 to-teal-500/5'
+          : 'glass-card border-border/50'
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-            type === 'suggested' ? 'bg-emerald-500' : 'bg-gray-400'
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+            type === 'suggested' 
+              ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' 
+              : 'bg-muted'
           }`}>
-            <Navigation className="w-4 h-4 text-white" />
+            <Navigation className={`w-5 h-5 ${type === 'suggested' ? 'text-white' : 'text-muted-foreground'}`} />
           </div>
           <div>
-            <div className="font-medium text-sm">{route.routeName}</div>
+            <div className="font-semibold text-sm text-foreground">{route.routeName}</div>
             {type === 'suggested' && (
-              <div className="flex items-center gap-1 text-emerald-700 text-xs font-medium">
+              <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
                 <Zap className="w-3 h-3" />
                 Recommended
               </div>
@@ -61,25 +63,25 @@ export function RouteOptimizationCard({
           </div>
         </div>
 
-        <div className={`px-2 py-1 rounded-md text-xs font-medium ${getTrafficColor(route.trafficLevel)}`}>
+        <div className={`px-2.5 py-1.5 rounded-lg text-xs font-bold ${getTrafficColor(route.trafficLevel)}`}>
           {route.trafficLevel.toUpperCase()}
         </div>
       </div>
 
       {/* Route Details */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Distance</span>
-          <span className="font-medium">{route.distance}</span>
+          <span className="font-semibold text-foreground">{route.distance}</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Est. Time</span>
-          <span className="font-medium">{route.estimatedTime}</span>
+          <span className="font-semibold text-foreground">{route.estimatedTime}</span>
         </div>
         {type === 'suggested' && route.savings !== '0 min' && (
-          <div className="flex items-center justify-between text-sm pt-2 border-t border-emerald-200">
-            <span className="text-emerald-700 font-medium">Time Saved</span>
-            <span className="text-emerald-700 font-bold text-base">{route.savings}</span>
+          <div className="flex items-center justify-between text-sm pt-3 border-t border-emerald-500/20">
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Time Saved</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">{route.savings}</span>
           </div>
         )}
       </div>
@@ -88,18 +90,18 @@ export function RouteOptimizationCard({
 
   return (
     <motion.div
-      className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl transition-all"
+      className="glass-card rounded-2xl p-6 hover:shadow-glow transition-all duration-300"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -6 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="font-medium">Shipment #{shipmentId}</h3>
+          <h3 className="font-semibold text-lg text-foreground">Shipment #{shipmentId}</h3>
           <p className="text-sm text-muted-foreground">Route Optimization Available</p>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">
+        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl text-sm font-semibold border border-indigo-500/20">
           <TrendingUp className="w-4 h-4" />
           Better Route Found
         </div>
@@ -110,7 +112,12 @@ export function RouteOptimizationCard({
         <RouteCard route={currentRoute} type="current" />
 
         <div className="flex items-center justify-center">
-          <ArrowRight className="w-6 h-6 text-gray-400" />
+          <motion.div
+            animate={{ x: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <ArrowRight className="w-6 h-6 text-muted-foreground" />
+          </motion.div>
         </div>
 
         <RouteCard route={suggestedRoute} type="suggested" />
@@ -118,28 +125,33 @@ export function RouteOptimizationCard({
 
       {/* Savings Highlight */}
       <motion.div
-        className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg p-4 mb-4"
+        className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl p-5 mb-5 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex items-center justify-between">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15),_transparent_50%)]" />
+        <div className="relative flex items-center justify-between">
           <div>
-            <div className="text-sm opacity-90">Potential Time Savings</div>
-            <div className="text-2xl font-bold">{suggestedRoute.savings}</div>
+            <div className="text-sm opacity-90 font-medium">Potential Time Savings</div>
+            <div className="text-3xl font-bold">{suggestedRoute.savings}</div>
           </div>
-          <Clock className="w-10 h-10 opacity-80" />
+          <Clock className="w-12 h-12 opacity-80" />
         </div>
       </motion.div>
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-3">
-        <button className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+      <div className="grid grid-cols-2 gap-4">
+        <motion.button 
+          className="px-4 py-3 glass border border-border/50 rounded-xl text-sm font-semibold text-foreground hover:bg-muted/50 transition-all duration-300"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
           Compare Details
-        </button>
+        </motion.button>
         <motion.button
           onClick={() => onApplyRoute(shipmentId)}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+          className="px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
