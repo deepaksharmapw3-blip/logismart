@@ -39,42 +39,42 @@ export function ShipmentMap({ shipments, onShipmentClick }: ShipmentMapProps) {
   return (
     <div className="relative w-full h-full glass-card rounded-2xl overflow-hidden">
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-violet-500/5" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-teal-500/3" />
       
       {/* Grid Background */}
       <div className="absolute inset-0" style={{
-        backgroundImage: `linear-gradient(rgba(99, 102, 241, 0.08) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(99, 102, 241, 0.08) 1px, transparent 1px)`,
-        backgroundSize: '40px 40px'
+        backgroundImage: `linear-gradient(var(--border) 1px, transparent 1px),
+                         linear-gradient(90deg, var(--border) 1px, transparent 1px)`,
+        backgroundSize: '48px 48px'
       }}></div>
 
       {/* Map Legend */}
-      <div className="absolute top-4 left-4 glass-card rounded-xl p-4 z-10">
-        <div className="text-xs font-semibold mb-3 text-foreground">Status Legend</div>
+      <div className="absolute top-5 left-5 glass-card rounded-xl p-4 z-10">
+        <div className="text-xs font-medium mb-3 text-foreground">Status Legend</div>
         <div className="space-y-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-            <span className="text-xs text-foreground/70 font-medium">On Time</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-teal-500"></div>
+            <span className="text-xs text-muted-foreground">On Time</span>
           </div>
           <div className="flex items-center gap-2.5">
-            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
-            <span className="text-xs text-foreground/70 font-medium">At Risk</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+            <span className="text-xs text-muted-foreground">At Risk</span>
           </div>
           <div className="flex items-center gap-2.5">
-            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-red-500 to-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
-            <span className="text-xs text-foreground/70 font-medium">Delayed</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <span className="text-xs text-muted-foreground">Delayed</span>
           </div>
         </div>
       </div>
 
       {/* Map Stats */}
-      <div className="absolute top-4 right-4 glass-card rounded-xl p-3 z-10">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500/20 to-violet-500/20 rounded-lg flex items-center justify-center border border-indigo-500/20">
-            <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+      <div className="absolute top-5 right-5 glass-card rounded-xl p-3.5 z-10">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 bg-primary/8 rounded-lg flex items-center justify-center border border-primary/10">
+            <Package className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <span className="text-sm font-bold text-foreground">{shipments.length}</span>
+            <span className="text-sm font-semibold text-foreground tabular-nums">{shipments.length}</span>
             <span className="text-xs text-muted-foreground ml-1">Active</span>
           </div>
         </div>
@@ -122,13 +122,13 @@ export function ShipmentMap({ shipments, onShipmentClick }: ShipmentMapProps) {
                 }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: index * 0.2 + 0.5 }}
+                transition={{ delay: index * 0.15 + 0.4, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="relative">
-                  <div className="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-800 dark:from-slate-400 dark:to-slate-600 rounded-lg flex items-center justify-center shadow-lg">
-                    <MapPin className="w-4 h-4 text-white dark:text-slate-900" />
+                  <div className="w-8 h-8 bg-foreground/80 rounded-lg flex items-center justify-center">
+                    <MapPin className="w-4 h-4 text-background" />
                   </div>
-                  <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap glass px-2 py-1 rounded-lg text-[10px] font-semibold text-foreground">
+                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap glass px-2 py-0.5 rounded text-[9px] font-medium text-muted-foreground">
                     Destination
                   </div>
                 </div>
@@ -147,23 +147,23 @@ export function ShipmentMap({ shipments, onShipmentClick }: ShipmentMapProps) {
                   x: '-50%',
                   y: '-50%',
                 }}
-                whileHover={{ scale: 1.15 }}
-                transition={{ delay: index * 0.2 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => onShipmentClick(shipment.id)}
               >
-                <div className={`relative ${getStatusBorderColor(shipment.status)} border-2 rounded-xl p-2.5 glass-card shadow-glow`}>
-                  <Navigation className={`w-5 h-5 ${getStatusColor(shipment.status).replace('bg-', 'text-')}`} />
+                <div className={`relative ${getStatusBorderColor(shipment.status)} border-2 rounded-xl p-2.5 glass-card`}>
+                  <Navigation className={`w-4 h-4 ${getStatusColor(shipment.status).replace('bg-', 'text-')}`} />
 
                   {/* Pulse Animation for at-risk and delayed */}
                   {(shipment.status === 'at-risk' || shipment.status === 'delayed') && (
                     <motion.div
-                      className={`absolute inset-0 rounded-xl ${getStatusColor(shipment.status)} opacity-30`}
+                      className={`absolute inset-0 rounded-xl ${getStatusColor(shipment.status)} opacity-20`}
                       animate={{
-                        scale: [1, 1.6, 1],
-                        opacity: [0.4, 0, 0.4],
+                        scale: [1, 1.5, 1],
+                        opacity: [0.3, 0, 0.3],
                       }}
                       transition={{
-                        duration: 2,
+                        duration: 2.5,
                         repeat: Infinity,
                         ease: "easeInOut",
                       }}
@@ -171,7 +171,7 @@ export function ShipmentMap({ shipments, onShipmentClick }: ShipmentMapProps) {
                   )}
 
                   {/* Shipment ID Label */}
-                  <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-200 dark:to-slate-300 text-white dark:text-slate-900 px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-lg">
+                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-foreground text-background px-2 py-0.5 rounded text-[9px] font-semibold">
                     {shipment.id}
                   </div>
                 </div>
@@ -183,20 +183,20 @@ export function ShipmentMap({ shipments, onShipmentClick }: ShipmentMapProps) {
 
       {/* Animated "Scanning" Effect */}
       <motion.div
-        className="absolute left-0 top-0 w-full h-0.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60"
+        className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
         animate={{
           y: [0, 700, 0],
         }}
         transition={{
-          duration: 5,
+          duration: 8,
           repeat: Infinity,
           ease: "linear",
         }}
       />
       
-      {/* Corner glow effects */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-radial from-indigo-500/10 to-transparent pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-radial from-violet-500/10 to-transparent pointer-events-none" />
+      {/* Subtle corner accents */}
+      <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-teal-500/5 to-transparent pointer-events-none" />
     </div>
   );
 }

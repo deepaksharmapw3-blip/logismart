@@ -14,10 +14,10 @@ export function AnalyticsDashboard() {
   ];
 
   const delayReasonsData = [
-    { name: 'Traffic', value: 35, color: '#ef4444' },
+    { name: 'Traffic', value: 35, color: '#dc2626' },
     { name: 'Weather', value: 25, color: '#f59e0b' },
-    { name: 'Warehouse', value: 20, color: '#6366f1' },
-    { name: 'Vehicle', value: 12, color: '#10b981' },
+    { name: 'Warehouse', value: 20, color: '#4338ca' },
+    { name: 'Vehicle', value: 12, color: '#0d9488' },
     { name: 'Other', value: 8, color: '#94a3b8' },
   ];
 
@@ -44,8 +44,7 @@ export function AnalyticsDashboard() {
       change: '+12.5%',
       trend: 'up' as const,
       icon: Package,
-      color: 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20',
-      glow: 'shadow-[0_0_20px_rgba(99,102,241,0.15)]',
+      color: 'bg-primary/8 text-primary border border-primary/12',
     },
     {
       label: 'On-Time Delivery',
@@ -53,8 +52,7 @@ export function AnalyticsDashboard() {
       change: '+3.2%',
       trend: 'up' as const,
       icon: CheckCircle2,
-      color: 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
-      glow: 'shadow-[0_0_20px_rgba(16,185,129,0.15)]',
+      color: 'bg-teal-500/8 text-teal-700 dark:text-teal-400 border border-teal-500/12',
     },
     {
       label: 'Avg Delay Time',
@@ -62,8 +60,7 @@ export function AnalyticsDashboard() {
       change: '-8.4%',
       trend: 'down' as const,
       icon: Clock,
-      color: 'bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20',
-      glow: 'shadow-[0_0_20px_rgba(245,158,11,0.15)]',
+      color: 'bg-amber-500/8 text-amber-700 dark:text-amber-400 border border-amber-500/12',
     },
     {
       label: 'Critical Issues',
@@ -71,68 +68,67 @@ export function AnalyticsDashboard() {
       change: '-50%',
       trend: 'down' as const,
       icon: AlertTriangle,
-      color: 'bg-gradient-to-br from-red-500/20 to-rose-500/20 text-red-600 dark:text-red-400 border border-red-500/20',
-      glow: 'shadow-[0_0_20px_rgba(239,68,68,0.15)]',
+      color: 'bg-red-500/8 text-red-700 dark:text-red-400 border border-red-500/12',
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Stats Grid */}
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           const TrendIcon = stat.trend === 'up' ? TrendingUp : TrendingDown;
           const trendColor =
             (stat.trend === 'up' && stat.label !== 'Critical Issues') ||
             (stat.trend === 'down' && (stat.label === 'Avg Delay Time' || stat.label === 'Critical Issues'))
-              ? 'text-emerald-600 dark:text-emerald-400 bg-gradient-to-r from-emerald-500/10 to-teal-500/10'
-              : 'text-red-600 dark:text-red-400 bg-gradient-to-r from-red-500/10 to-rose-500/10';
+              ? 'text-teal-700 dark:text-teal-400 bg-teal-500/8'
+              : 'text-red-700 dark:text-red-400 bg-red-500/8';
 
           return (
             <motion.div
               key={index}
-              className={`glass-card rounded-2xl p-5 hover:shadow-glow transition-all duration-300 ${stat.glow}`}
-              initial={{ opacity: 0, y: 20 }}
+              className="glass-card rounded-2xl p-6 hover:shadow-glow transition-all duration-300"
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -4, scale: 1.01 }}
+              transition={{ delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -3 }}
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-5">
                 <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center`}>
-                  <Icon className="w-6 h-6" />
+                  <Icon className="w-5 h-5" />
                 </div>
-                <div className={`flex items-center gap-1 text-sm font-bold px-2.5 py-1 rounded-lg ${trendColor}`}>
-                  <TrendIcon className="w-4 h-4" />
+                <div className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg ${trendColor}`}>
+                  <TrendIcon className="w-3.5 h-3.5" />
                   {stat.change}
                 </div>
               </div>
-              <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
-              <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
+              <div className="text-3xl font-semibold text-foreground tabular-nums mb-1">{stat.value}</div>
+              <div className="text-sm text-muted-foreground">{stat.label}</div>
             </motion.div>
           );
         })}
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-8">
         {/* Delivery Trends */}
         <motion.div
           className="glass-card rounded-2xl p-6 hover:shadow-glow transition-all duration-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h3 className="font-semibold text-foreground mb-5">Delivery Trends (Last 7 Days)</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="font-medium text-foreground mb-6">Delivery Trends (Last 7 Days)</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={deliveryTrendsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(99, 102, 241, 0.1)" />
-              <XAxis dataKey="day" stroke="currentColor" className="text-muted-foreground" fontSize={12} />
-              <YAxis stroke="currentColor" className="text-muted-foreground" fontSize={12} />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '12px', fontSize: '12px' }} />
-              <Line type="monotone" dataKey="onTime" stroke="#10b981" strokeWidth={3} name="On Time" dot={{ fill: '#10b981', strokeWidth: 2 }} />
-              <Line type="monotone" dataKey="atRisk" stroke="#f59e0b" strokeWidth={3} name="At Risk" dot={{ fill: '#f59e0b', strokeWidth: 2 }} />
-              <Line type="monotone" dataKey="delayed" stroke="#ef4444" strokeWidth={3} name="Delayed" dot={{ fill: '#ef4444', strokeWidth: 2 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+              <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+              <Tooltip contentStyle={{ backgroundColor: 'var(--popover)', backdropFilter: 'blur(12px)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+              <Line type="monotone" dataKey="onTime" stroke="#0d9488" strokeWidth={2.5} name="On Time" dot={{ fill: '#0d9488', strokeWidth: 0, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="atRisk" stroke="#f59e0b" strokeWidth={2.5} name="At Risk" dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="delayed" stroke="#dc2626" strokeWidth={2.5} name="Delayed" dot={{ fill: '#dc2626', strokeWidth: 0, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -140,12 +136,12 @@ export function AnalyticsDashboard() {
         {/* Delay Reasons */}
         <motion.div
           className="glass-card rounded-2xl p-6 hover:shadow-glow transition-all duration-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h3 className="font-semibold text-foreground mb-5">Top Delay Causes</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="font-medium text-foreground mb-6">Top Delay Causes</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
                 data={delayReasonsData}
@@ -153,43 +149,39 @@ export function AnalyticsDashboard() {
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
+                outerRadius={95}
+                innerRadius={50}
                 fill="#8884d8"
                 dataKey="value"
+                strokeWidth={0}
               >
                 {delayReasonsData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '12px' }} />
+              <Tooltip contentStyle={{ backgroundColor: 'var(--popover)', backdropFilter: 'blur(12px)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
             </PieChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
 
       {/* Route Performance & Bottlenecks */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-8">
         {/* Route Performance */}
         <motion.div
           className="glass-card rounded-2xl p-6 hover:shadow-glow transition-all duration-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h3 className="font-semibold text-foreground mb-5">Route Performance (Avg Delay)</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="font-medium text-foreground mb-6">Route Performance (Avg Delay)</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart data={routePerformanceData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(99, 102, 241, 0.1)" />
-              <XAxis dataKey="route" stroke="currentColor" className="text-muted-foreground" fontSize={12} />
-              <YAxis stroke="currentColor" className="text-muted-foreground" fontSize={12} label={{ value: 'Minutes', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }} />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '12px', fontSize: '12px' }} />
-              <Bar dataKey="avgDelay" fill="url(#barGradient)" radius={[10, 10, 0, 0]} />
-              <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366f1" />
-                  <stop offset="100%" stopColor="#8b5cf6" />
-                </linearGradient>
-              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+              <XAxis dataKey="route" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} label={{ value: 'Minutes', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'var(--muted-foreground)' } }} />
+              <Tooltip contentStyle={{ backgroundColor: 'var(--popover)', backdropFilter: 'blur(12px)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+              <Bar dataKey="avgDelay" fill="var(--primary)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -197,36 +189,36 @@ export function AnalyticsDashboard() {
         {/* Bottleneck Detection */}
         <motion.div
           className="glass-card rounded-2xl p-6 hover:shadow-glow transition-all duration-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h3 className="font-semibold text-foreground mb-5">Detected Bottlenecks</h3>
-          <div className="space-y-3">
+          <h3 className="font-medium text-foreground mb-6">Detected Bottlenecks</h3>
+          <div className="space-y-2.5">
             {bottleneckData.map((bottleneck, index) => {
               const severityConfig = {
-                high: { color: 'bg-gradient-to-r from-red-500/10 to-rose-500/10 text-red-600 dark:text-red-400 border-red-500/20', dot: 'bg-gradient-to-r from-red-500 to-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' },
-                medium: { color: 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20', dot: 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' },
-                low: { color: 'bg-gradient-to-r from-indigo-500/10 to-violet-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20', dot: 'bg-gradient-to-r from-indigo-500 to-violet-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' },
+                high: { color: 'bg-red-500/8 text-red-700 dark:text-red-400 border border-red-500/12', dot: 'bg-red-500' },
+                medium: { color: 'bg-amber-500/8 text-amber-700 dark:text-amber-400 border border-amber-500/12', dot: 'bg-amber-500' },
+                low: { color: 'bg-primary/8 text-primary border border-primary/12', dot: 'bg-primary' },
               }[bottleneck.severity];
 
               return (
                 <motion.div
                   key={index}
-                  className="flex items-center justify-between p-3.5 glass rounded-xl hover:shadow-glow transition-all duration-300"
-                  initial={{ opacity: 0, x: -20 }}
+                  className="flex items-center justify-between p-4 glass rounded-xl hover:shadow-glow transition-all duration-200"
+                  initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + index * 0.1 }}
-                  whileHover={{ x: 4 }}
+                  transition={{ delay: 0.6 + index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ x: 3 }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-2.5 h-2.5 rounded-full ${severityConfig.dot} animate-pulse`}></div>
+                    <div className={`w-2 h-2 rounded-full ${severityConfig.dot}`}></div>
                     <div>
-                      <div className="font-semibold text-sm text-foreground">{bottleneck.location}</div>
-                      <div className="text-xs text-muted-foreground">Avg delay: {bottleneck.delay} min</div>
+                      <div className="font-medium text-sm text-foreground">{bottleneck.location}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">Avg delay: {bottleneck.delay} min</div>
                     </div>
                   </div>
-                  <div className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border ${severityConfig.color} uppercase tracking-wide`}>
+                  <div className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold ${severityConfig.color} uppercase tracking-wide`}>
                     {bottleneck.severity}
                   </div>
                 </motion.div>
@@ -234,14 +226,14 @@ export function AnalyticsDashboard() {
             })}
           </div>
 
-          <div className="mt-6 pt-5 border-t border-border/50 grid grid-cols-2 gap-4">
-            <div className="glass rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold text-red-600 dark:text-red-400">{bottleneckData.filter(b => b.severity === 'high').length}</div>
-              <div className="text-xs text-muted-foreground font-medium">Critical Bottlenecks</div>
+          <div className="mt-6 pt-5 border-t border-border/40 grid grid-cols-2 gap-4">
+            <div className="glass rounded-xl p-4 text-center">
+              <div className="text-2xl font-semibold text-red-600 dark:text-red-400 tabular-nums">{bottleneckData.filter(b => b.severity === 'high').length}</div>
+              <div className="text-xs text-muted-foreground mt-1">Critical Bottlenecks</div>
             </div>
-            <div className="glass rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{bottleneckData.filter(b => b.severity === 'medium').length}</div>
-              <div className="text-xs text-muted-foreground font-medium">Medium Priority</div>
+            <div className="glass rounded-xl p-4 text-center">
+              <div className="text-2xl font-semibold text-amber-600 dark:text-amber-400 tabular-nums">{bottleneckData.filter(b => b.severity === 'medium').length}</div>
+              <div className="text-xs text-muted-foreground mt-1">Medium Priority</div>
             </div>
           </div>
         </motion.div>

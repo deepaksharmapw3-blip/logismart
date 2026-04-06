@@ -198,49 +198,56 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="glass-card sticky top-0 z-40 border-b border-border">
-        <div className="max-w-[1600px] mx-auto px-6 py-4">
+      <header className="glass-card sticky top-0 z-40 border-b border-border/50">
+        <div className="max-w-[1600px] mx-auto px-8 py-5">
           <div className="flex items-center justify-between">
             <motion.div 
-              className="flex items-center gap-3"
+              className="flex items-center gap-4"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="relative">
-                <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-glow">
+              <div className="relative group">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-glow transition-transform duration-300 group-hover:scale-105">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl blur opacity-30 -z-10"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl blur-lg opacity-40 -z-10 transition-opacity group-hover:opacity-60"></div>
               </div>
               <div>
-                <h1 className="font-bold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                <h1 className="font-semibold text-xl tracking-tight text-foreground">
                   LogiSmart
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground tracking-wide">
                   Predictive Supply Chain Intelligence
                 </p>
               </div>
             </motion.div>
 
             <motion.div 
-              className="flex items-center gap-4"
+              className="flex items-center gap-5"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
+              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-teal-500/8 text-teal-700 dark:text-teal-400 rounded-xl border border-teal-500/15">
+                <div className="relative flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-teal-500"></div>
+                  <div className="absolute w-2 h-2 rounded-full bg-teal-500 animate-ping opacity-75"></div>
+                </div>
                 <span className="text-sm font-medium">
                   All Systems Operational
                 </span>
               </div>
-              <button className="relative p-2.5 glass-card rounded-xl hover:shadow-glow transition-all duration-300 group">
-                <Bell className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <motion.button 
+                className="relative p-3 glass-card rounded-xl hover:shadow-glow transition-all duration-300 group"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Bell className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                 {alerts.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-r from-red-500 to-rose-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-background"></span>
                 )}
-              </button>
+              </motion.button>
             </motion.div>
           </div>
         </div>
@@ -253,9 +260,9 @@ export default function App() {
       />
 
       {/* Navigation Tabs */}
-      <div className="glass border-b border-border/50">
-        <div className="max-w-[1600px] mx-auto px-6">
-          <div className="flex gap-1">
+      <nav className="glass border-b border-border/30">
+        <div className="max-w-[1600px] mx-auto px-8">
+          <div className="flex gap-2">
             {[
               {
                 id: "overview",
@@ -284,24 +291,23 @@ export default function App() {
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`relative flex items-center gap-2 px-5 py-3.5 transition-all duration-300 ${
+                  className={`relative flex items-center gap-2.5 px-5 py-4 transition-all duration-200 rounded-t-xl ${
                     isActive
-                      ? "text-primary font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-foreground font-medium"
+                      : "text-muted-foreground hover:text-foreground/80"
                   }`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ y: -1 }}
+                  transition={{ delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
-                  {tab.label}
+                  <Icon className={`w-4 h-4 transition-colors duration-200 ${isActive ? 'text-primary' : ''}`} />
+                  <span className="text-sm">{tab.label}</span>
                   {isActive && (
                     <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                      className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary rounded-full"
                       layoutId="activeTab"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
                     />
                   )}
                 </motion.button>
@@ -309,24 +315,24 @@ export default function App() {
             })}
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Main Content */}
-      <main className="max-w-[1600px] mx-auto px-6 py-8">
+      <main className="max-w-[1600px] mx-auto px-8 py-10">
         {activeTab === "overview" && (
           <motion.div 
-            className="grid grid-cols-3 gap-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
+            className="grid grid-cols-3 gap-8"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* Left Column - Shipment List */}
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-lg bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                <h2 className="font-medium text-lg text-foreground">
                   Active Shipments
                 </h2>
-                <span className="text-sm text-muted-foreground px-3 py-1 glass-card rounded-lg">
+                <span className="text-xs text-muted-foreground px-3 py-1.5 glass rounded-full font-medium">
                   {shipments.length} total
                 </span>
               </div>
@@ -337,8 +343,8 @@ export default function App() {
             </div>
 
             {/* Middle & Right Columns - Map */}
-            <div className="col-span-2">
-              <h2 className="font-semibold text-lg mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+            <div className="col-span-2 space-y-5">
+              <h2 className="font-medium text-lg text-foreground">
                 Real-Time Tracking
               </h2>
               <div className="h-[700px]">
@@ -358,34 +364,34 @@ export default function App() {
 
         {activeTab === "predictions" && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="font-semibold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                <h2 className="font-medium text-xl text-foreground">
                   Delay Predictions
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-1.5">
                   AI-powered predictions based on real-time data
                 </p>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-500/20">
+              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-amber-500/8 text-amber-700 dark:text-amber-400 rounded-xl border border-amber-500/15">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm font-semibold">
+                <span className="text-sm font-medium">
                   {delayPredictions.length} Shipments at Risk
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-8">
               {delayPredictions.map((prediction, index) => (
                 <motion.div
                   key={prediction.shipmentId}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <DelayPredictionCard
                     prediction={prediction}
@@ -399,34 +405,34 @@ export default function App() {
 
         {activeTab === "routes" && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="font-semibold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                <h2 className="font-medium text-xl text-foreground">
                   Smart Route Optimization
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-1.5">
                   Dynamic route suggestions to minimize delays
                 </p>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20 shadow-glow-success">
+              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-teal-500/8 text-teal-700 dark:text-teal-400 rounded-xl border border-teal-500/15 shadow-glow-success">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-semibold">
+                <span className="text-sm font-medium">
                   Avg 22 min savings per route
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-8">
               {routeOptimizations.map((optimization, index) => (
                 <motion.div
                   key={optimization.shipmentId}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.15 }}
+                  transition={{ delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <RouteOptimizationCard
                     {...optimization}
@@ -440,15 +446,15 @@ export default function App() {
 
         {activeTab === "analytics" && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="mb-8">
-              <h2 className="font-semibold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+            <div className="mb-10">
+              <h2 className="font-medium text-xl text-foreground">
                 Performance Analytics
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1.5">
                 Insights and trends across your supply chain
               </p>
             </div>
