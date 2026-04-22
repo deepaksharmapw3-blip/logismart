@@ -79,6 +79,9 @@ temp/
 # Frontend specific (if exists at root)
 src/node_modules/
 
+# Separate projects
+logismart/
+
 # Test files
 __tests__/
 *.test.js

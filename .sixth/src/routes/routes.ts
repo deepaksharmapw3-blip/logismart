@@ -55,21 +55,27 @@ router.post('/generate-missing', async (req: Request, res: Response) => {
     for (const shipment of missingShipments) {
       console.log('Generating route optimization for missing shipment:', shipment.id);
       
+      // Generate realistic route data
+      const baseDistance = Math.floor(Math.random() * 800) + 400;
+      const baseTime = Math.floor(Math.random() * 12) + 6;
+      const optimizedTime = baseTime - Math.floor(Math.random() * 3) - 1;
+      const timeSaved = baseTime - optimizedTime;
+      
       const routeOpt = await DataStore.addRouteOptimization({
         shipmentId: shipment.id,
         currentRoute: {
           routeName: 'Current Route',
-          distance: 'TBD',
-          estimatedTime: shipment.eta,
-          savings: '0%',
+          distance: `${baseDistance} km`,
+          estimatedTime: `${baseTime} hours`,
+          savings: '0 mins',
           trafficLevel: 'medium',
           recommended: false,
         },
         suggestedRoute: {
           routeName: 'Optimized Route',
-          distance: 'TBD',
-          estimatedTime: shipment.eta,
-          savings: '15%',
+          distance: `${baseDistance - Math.floor(Math.random() * 100)} km`,
+          estimatedTime: `${optimizedTime} hours`,
+          savings: `${timeSaved * 60} mins`,
           trafficLevel: 'low',
           recommended: true,
         },
@@ -109,15 +115,68 @@ router.post('/apply', async (req: Request, res: Response) => {
   }
   
   const { shipmentId } = validation.data;
+  console.log('Applying route for shipment:', shipmentId);
+  
+  // Check if route optimization exists
+  let optimization = await DataStore.getRouteOptimizationByShipmentId(shipmentId);
+  
+  // If not found, generate one on the fly
+  if (!optimization) {
+    console.log('Route optimization not found, generating for shipment:', shipmentId);
+    
+    const shipment = await DataStore.getShipmentById(shipmentId);
+    if (!shipment) {
+      return res.status(404).json({
+        success: false,
+        error: 'Shipment not found',
+        timestamp: new Date().toISOString(),
+      });
+    }
+    
+    // Generate realistic route data
+    const baseDistance = Math.floor(Math.random() * 800) + 400;
+    const baseTime = Math.floor(Math.random() * 12) + 6;
+    const optimizedTime = baseTime - Math.floor(Math.random() * 3) - 1;
+    const timeSaved = baseTime - optimizedTime;
+    
+    const newOptimization = await DataStore.addRouteOptimization({
+      shipmentId: shipment.id,
+      currentRoute: {
+        routeName: 'Current Route',
+        distance: `${baseDistance} km`,
+        estimatedTime: `${baseTime} hours`,
+        savings: '0 mins',
+        trafficLevel: 'medium',
+        recommended: false,
+      },
+      suggestedRoute: {
+        routeName: 'Optimized Route',
+        distance: `${baseDistance - Math.floor(Math.random() * 100)} km`,
+        estimatedTime: `${optimizedTime} hours`,
+        savings: `${timeSaved * 60} mins`,
+        trafficLevel: 'low',
+        recommended: true,
+      },
+    });
+    
+    if (newOptimization) {
+      optimization = newOptimization;
+    }
+    
+    console.log('Route optimization generated on-the-fly:', newOptimization ? 'SUCCESS' : 'FAILED');
+  }
+  
   const applied = await DataStore.applyRoute(shipmentId);
   
   if (!applied) {
     return res.status(404).json({
       success: false,
-      error: 'Route optimization not found for this shipment',
+      error: 'Failed to apply route',
       timestamp: new Date().toISOString(),
     });
   }
+  
+  console.log('Route applied successfully for shipment:', shipmentId);
   
   const response: ApiResponse<{ shipmentId: string; applied: boolean }> = {
     success: true,

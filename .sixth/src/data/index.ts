@@ -81,22 +81,24 @@ export const DataStore = {
   // Delay Predictions
   getAllPredictions: async (): Promise<DelayPrediction[]> => {
     const memoryData = MemoryStore.getAllPredictions();
+    console.log(`DEBUG getAllPredictions: memoryData=${memoryData.length}, supabaseWorking=${supabaseWorking}`);
     
-    if (supabaseWorking) {
-      try {
-        const supabaseData = await SupabaseStore.getAllPredictions();
-        // Merge both sources
-        const merged = [...supabaseData];
-        memoryData.forEach(memItem => {
-          if (!merged.find(s => s.shipmentId === memItem.shipmentId)) {
-            merged.push(memItem);
-          }
-        });
-        return merged;
-      } catch (error) {
-        console.warn('Supabase getAllPredictions failed:', error);
-      }
-    }
+    // Temporarily disable Supabase for predictions until tables are created
+    // if (supabaseWorking) {
+    //   try {
+    //     const supabaseData = await SupabaseStore.getAllPredictions();
+    //     // Merge both sources
+    //     const merged = [...supabaseData];
+    //     memoryData.forEach(memItem => {
+    //       if (!merged.find(s => s.shipmentId === memItem.shipmentId)) {
+    //         merged.push(memItem);
+    //       }
+    //     });
+    //     return merged;
+    //   } catch (error) {
+    //     console.warn('Supabase getAllPredictions failed:', error);
+    //   }
+    // }
     return memoryData;
   },
   
@@ -133,22 +135,24 @@ export const DataStore = {
   // Route Optimizations
   getAllRouteOptimizations: async (): Promise<RouteOptimization[]> => {
     const memoryData = MemoryStore.getAllRouteOptimizations();
+    console.log(`DEBUG getAllRouteOptimizations: memoryData=${memoryData.length}, supabaseWorking=${supabaseWorking}`);
     
-    if (supabaseWorking) {
-      try {
-        const supabaseData = await SupabaseStore.getAllRouteOptimizations();
-        // Merge both sources
-        const merged = [...supabaseData];
-        memoryData.forEach(memItem => {
-          if (!merged.find(s => s.shipmentId === memItem.shipmentId)) {
-            merged.push(memItem);
-          }
-        });
-        return merged;
-      } catch (error) {
-        console.warn('Supabase getAllRouteOptimizations failed:', error);
-      }
-    }
+    // Temporarily disable Supabase for routes until tables are created
+    // if (supabaseWorking) {
+    //   try {
+    //     const supabaseData = await SupabaseStore.getAllRouteOptimizations();
+    //     // Merge both sources
+    //     const merged = [...supabaseData];
+    //     memoryData.forEach(memItem => {
+    //       if (!merged.find(s => s.shipmentId === memItem.shipmentId)) {
+    //         merged.push(memItem);
+    //       }
+    //     });
+    //     return merged;
+    //   } catch (error) {
+    //     console.warn('Supabase getAllRouteOptimizations failed:', error);
+    //   }
+    // }
     return memoryData;
   },
   
@@ -175,10 +179,24 @@ export const DataStore = {
   },
   
   applyRoute: async (shipmentId: string): Promise<boolean> => {
-    if (isSupabaseConfigured()) {
-      return SupabaseStore.applyRoute(shipmentId);
+    // Try memory store first (where routes are actually stored)
+    const memoryResult = MemoryStore.applyRoute(shipmentId);
+    if (memoryResult) {
+      console.log('Route applied from memory store:', shipmentId);
+      return true;
     }
-    return MemoryStore.applyRoute(shipmentId);
+    
+    // Fallback to Supabase if not in memory
+    if (isSupabaseConfigured()) {
+      try {
+        const supabaseResult = await SupabaseStore.applyRoute(shipmentId);
+        if (supabaseResult) return supabaseResult;
+      } catch (error) {
+        console.warn('Supabase applyRoute failed:', error);
+      }
+    }
+    
+    return false;
   },
 
   // Alerts

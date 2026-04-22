@@ -23,7 +23,22 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://fonts.googleapis.com"],
+      scriptSrcElem: ["'self'", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://fonts.googleapis.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://maps.gstatic.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://*.googleapis.com"],
+      connectSrc: ["'self'", "https://maps.googleapis.com", "https://*.googleapis.com"],
+      frameSrc: ["'self'", "https://maps.google.com", "https://www.google.com"],
+      objectSrc: ["'none'"],
+      childSrc: ["'self'", "blob:"],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,

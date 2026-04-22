@@ -322,16 +322,25 @@ export const DataStore = {
     const optimization = routeOptimizations.find(r => r.shipmentId === shipmentId);
     if (!optimization) return false;
     
-    // In a real app, this would update the shipment with the new route
-    // For now, we just create a success alert
+    // Update the shipment status to reflect route optimization
+    const shipment = shipments.find(s => s.id === shipmentId);
+    if (shipment) {
+      // Improve the shipment status after applying optimized route
+      shipment.status = 'on-time';
+      shipment.delayProbability = Math.max(0, shipment.delayProbability - 20);
+      shipment.updatedAt = new Date();
+    }
+    
+    // Create a success alert with detailed information
     DataStore.addAlert({
       type: 'success',
-      title: 'Route Applied',
-      message: `Optimized route applied for shipment #${shipmentId}`,
+      title: 'Route Optimized Successfully',
+      message: `Applied optimized route for shipment #${shipmentId}. Saving: ${optimization.suggestedRoute.savings}. New ETA: ${optimization.suggestedRoute.estimatedTime}`,
       shipmentId,
       priority: 'low',
     });
     
+    console.log(`Route applied for shipment ${shipmentId}: ${optimization.suggestedRoute.savings} saved`);
     return true;
   },
 

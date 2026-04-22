@@ -65,6 +65,17 @@ export default function App() {
         routes: routesData.length,
         alerts: alertsData.length
       });
+      
+      // Log prediction and route shipment IDs for debugging
+      if (predictionsData.length > 0) {
+        console.log('Prediction shipment IDs:', predictionsData.map(p => p.shipmentId));
+      }
+      if (routesData.length > 0) {
+        console.log('Route optimization shipment IDs:', routesData.map(r => r.shipmentId));
+      }
+      if (shipmentsData.length > 0) {
+        console.log('Shipment IDs:', shipmentsData.map(s => s.id));
+      }
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -102,15 +113,21 @@ export default function App() {
   const handleApplyRoute = async (shipmentId: string) => {
     try {
       await api.applyRoute(shipmentId);
-      // Refresh alerts and route optimizations after applying route
-      const [updatedAlerts, updatedRoutes] = await Promise.all([
+      // Refresh ALL data after applying route to show updated shipment status
+      const [updatedShipments, updatedAlerts, updatedRoutes] = await Promise.all([
+        api.getShipments(),
         api.getAlerts(),
         api.getRouteOptimizations(),
       ]);
+      setShipments(updatedShipments);
       setAlerts(updatedAlerts);
       setRouteOptimizations(updatedRoutes);
       setAppliedRoutes(prev => new Set(prev).add(shipmentId));
-      alert(`Route applied successfully for shipment #${shipmentId}!`);
+      
+      // Show success notification
+      const route = routeOptimizations.find(r => r.shipmentId === shipmentId);
+      const savings = route?.suggestedRoute.savings || 'N/A';
+      alert(`Route optimized successfully for shipment #${shipmentId}!\nTime saved: ${savings}\nShipment status updated to: On Time`);
     } catch (err) {
       console.error("Error applying route:", err);
       alert("Failed to apply route. Please try again.");

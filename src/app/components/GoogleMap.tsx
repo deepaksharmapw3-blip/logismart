@@ -131,20 +131,38 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
     const bounds = new window.google.maps.LatLngBounds();
 
     shipments.forEach((shipment) => {
-      // Current location marker
+      // Current location marker with animation
       const currentMarker = new window.google.maps.Marker({
         position: shipment.location,
         map,
         title: `Shipment ${shipment.id}`,
+        animation: window.google.maps.Animation.DROP,
         icon: {
           path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 10,
+          scale: 12,
           fillColor: shipment.status === 'on-time' ? '#10b981' : 
                      shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
           fillOpacity: 1,
-          strokeWeight: 2,
+          strokeWeight: 3,
           strokeColor: '#ffffff'
         }
+      });
+
+      // Info window for current location
+      const infoWindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px; min-width: 200px;">
+            <h3 style="font-weight: bold; margin-bottom: 8px;">Shipment #${shipment.id}</h3>
+            <p style="margin: 4px 0; font-size: 13px;"><strong>Status:</strong> ${shipment.status.toUpperCase()}</p>
+            <p style="margin: 4px 0; font-size: 13px;"><strong>Location:</strong> ${shipment.location.lat.toFixed(4)}, ${shipment.location.lng.toFixed(4)}</p>
+          </div>
+        `
+      });
+
+      // Click handler for info window
+      currentMarker.addListener('click', () => {
+        infoWindow.open(map, currentMarker);
+        onShipmentClick(shipment.id);
       });
 
       // Destination marker
@@ -154,7 +172,7 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
         title: `Destination for ${shipment.id}`,
         icon: {
           path: window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-          scale: 6,
+          scale: 8,
           fillColor: '#6366f1',
           fillOpacity: 1,
           strokeWeight: 2,
@@ -162,31 +180,71 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
         }
       });
 
-      // Route line
+      // Route line with animation
       const routePath = new window.google.maps.Polyline({
         path: [shipment.location, shipment.destination],
         geodesic: true,
         strokeColor: shipment.status === 'on-time' ? '#10b981' : 
                      shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
-        strokeOpacity: 0.6,
-        strokeWeight: 2,
+        strokeOpacity: 0.8,
+        strokeWeight: 3,
+        icons: [{
+          icon: {
+            path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 3,
+            fillColor: shipment.status === 'on-time' ? '#10b981' : 
+                       shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
+            fillOpacity: 1,
+            strokeWeight: 1
+          },
+          offset: '0',
+          repeat: '30px'
+        }],
         map
       });
 
-      // Click handler
-      currentMarker.addListener('click', () => {
-        onShipmentClick(shipment.id);
-      });
+      // Animate the route line
+      let offset = 0;
+      const animateRoute = () => {
+        offset = (offset + 1) % 30;
+        routePath.set('icons', [{
+          icon: {
+            path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 3,
+            fillColor: shipment.status === 'on-time' ? '#10b981' : 
+                       shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
+            fillOpacity: 1,
+            strokeWeight: 1
+          },
+          offset: `${offset}px`,
+          repeat: '30px'
+        }]);
+      };
+      const routeAnimation = setInterval(animateRoute, 100);
 
       markersRef.current.push(currentMarker, destMarker);
       bounds.extend(shipment.location);
       bounds.extend(shipment.destination);
+
+      // Store interval for cleanup
+      (currentMarker as any).routeAnimation = routeAnimation;
     });
 
     // Fit bounds if we have shipments
     if (shipments.length > 0) {
       map.fitBounds(bounds);
     }
+
+    // Cleanup function
+    return () => {
+      markersRef.current.forEach(marker => {
+        if ((marker as any).routeAnimation) {
+          clearInterval((marker as any).routeAnimation);
+        }
+        marker.setMap(null);
+      });
+      markersRef.current = [];
+    };
   }, [map, shipments, onShipmentClick]);
 
   if (loadError) {
