@@ -1,5 +1,6 @@
-import { motion } from 'motion/react';
-import { Navigation, Clock, TrendingUp, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Navigation, Clock, TrendingUp, ArrowRight, CheckCircle2, Zap, X, MapPin, Fuel, AlertCircle } from 'lucide-react';
 
 interface Route {
   routeName: string;
@@ -25,6 +26,7 @@ export function RouteOptimizationCard({
   onApplyRoute,
   applied = false,
 }: RouteOptimizationCardProps) {
+  const [showComparison, setShowComparison] = useState(false);
   const getTrafficColor = (level: Route['trafficLevel']) => {
     switch (level) {
       case 'low':
@@ -136,18 +138,24 @@ export function RouteOptimizationCard({
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-3">
-        <button className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
-          Compare Details
-        </button>
+        <motion.button 
+          onClick={() => setShowComparison(true)}
+          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <ArrowRight className="w-4 h-4" />
+          Compare Routes
+        </motion.button>
         {applied ? (
-          <div className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium flex items-center justify-center gap-2 cursor-not-allowed">
+          <div className="px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium flex items-center justify-center gap-2 cursor-not-allowed">
             <CheckCircle2 className="w-4 h-4" />
             Route Applied
           </div>
         ) : (
           <motion.button
             onClick={() => onApplyRoute(shipmentId)}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-md hover:shadow-lg"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -156,6 +164,176 @@ export function RouteOptimizationCard({
           </motion.button>
         )}
       </div>
+
+      {/* Comparison Modal */}
+      <AnimatePresence>
+        {showComparison && (
+          <motion.div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowComparison(false)}
+          >
+            <motion.div
+              className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-slate-700 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="sticky top-0 bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700 p-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Route Detailed Comparison</h2>
+                  <p className="text-slate-400 text-sm">Shipment #{shipmentId}</p>
+                </div>
+                <button
+                  onClick={() => setShowComparison(false)}
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-8">
+                {/* Comparison Table */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-blue-400" />
+                    Route Metrics
+                  </h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* Metric Header */}
+                    <div className="col-span-3 grid grid-cols-3 gap-4 mb-2 pb-2 border-b border-slate-700">
+                      <div className="text-slate-400 text-xs font-semibold uppercase">Metric</div>
+                      <div className="text-slate-400 text-xs font-semibold uppercase flex items-center gap-2">
+                        <Navigation className="w-3 h-3" />
+                        Current Route
+                      </div>
+                      <div className="text-slate-400 text-xs font-semibold uppercase flex items-center gap-2">
+                        <Zap className="w-3 h-3 text-emerald-400" />
+                        Suggested Route
+                      </div>
+                    </div>
+
+                    {/* Distance */}
+                    <div className="col-span-3 grid grid-cols-3 gap-4 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors">
+                      <div className="text-slate-300 font-medium">Distance</div>
+                      <div className="text-white flex items-center gap-2">
+                        {currentRoute.distance}
+                      </div>
+                      <div className="text-emerald-400 font-semibold flex items-center gap-2">
+                        {suggestedRoute.distance}
+                        <span className="text-xs text-emerald-300">↓ Shorter</span>
+                      </div>
+                    </div>
+
+                    {/* Time */}
+                    <div className="col-span-3 grid grid-cols-3 gap-4 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors">
+                      <div className="text-slate-300 font-medium flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Est. Time
+                      </div>
+                      <div className="text-white">{currentRoute.estimatedTime}</div>
+                      <div className="text-emerald-400 font-semibold">{suggestedRoute.estimatedTime}</div>
+                    </div>
+
+                    {/* Traffic Level */}
+                    <div className="col-span-3 grid grid-cols-3 gap-4 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors">
+                      <div className="text-slate-300 font-medium">Traffic Level</div>
+                      <div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          currentRoute.trafficLevel === 'low' ? 'bg-emerald-500/30 text-emerald-300' :
+                          currentRoute.trafficLevel === 'medium' ? 'bg-amber-500/30 text-amber-300' :
+                          'bg-red-500/30 text-red-300'
+                        }`}>
+                          {currentRoute.trafficLevel.toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          suggestedRoute.trafficLevel === 'low' ? 'bg-emerald-500/30 text-emerald-300' :
+                          suggestedRoute.trafficLevel === 'medium' ? 'bg-amber-500/30 text-amber-300' :
+                          'bg-red-500/30 text-red-300'
+                        }`}>
+                          {suggestedRoute.trafficLevel.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Time Savings */}
+                    <div className="col-span-3 grid grid-cols-3 gap-4 p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/50 hover:bg-emerald-500/30 transition-colors">
+                      <div className="text-emerald-300 font-bold flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
+                        Time Savings
+                      </div>
+                      <div className="text-slate-400">-</div>
+                      <div className="text-emerald-400 font-bold text-lg">{suggestedRoute.savings}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Benefits Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-amber-400" />
+                    Benefits of Suggested Route
+                  </h3>
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-white font-medium">Faster Delivery</div>
+                        <div className="text-slate-400 text-sm mt-1">Save {suggestedRoute.savings} by taking the recommended route</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-white font-medium">Better Traffic Conditions</div>
+                        <div className="text-slate-400 text-sm mt-1">Lower traffic level: {suggestedRoute.trafficLevel} vs {currentRoute.trafficLevel}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-white font-medium">Optimized Distance</div>
+                        <div className="text-slate-400 text-sm mt-1">Shorter route: {suggestedRoute.distance} vs {currentRoute.distance}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Footer */}
+                <div className="flex gap-3 pt-4 border-t border-slate-700">
+                  <button
+                    onClick={() => setShowComparison(false)}
+                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors"
+                  >
+                    Close
+                  </button>
+                  {!applied && (
+                    <motion.button
+                      onClick={() => {
+                        onApplyRoute(shipmentId);
+                        setShowComparison(false);
+                      }}
+                      className="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <CheckCircle2 className="w-5 h-5" />
+                      Apply This Route
+                    </motion.button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

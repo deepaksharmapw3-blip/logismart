@@ -216,5 +216,9 @@ router.get('/performance', async (req: Request, res: Response) => {
     });
   }
 });
+    timestamp: new Date().toISOString(),
+  };
+  res.json(response);
+});
 
 export default router;
