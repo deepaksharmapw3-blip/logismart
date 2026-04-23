@@ -40,7 +40,15 @@ pnpm install
 cp .env.example .env
 ```
 
-3. Start the development server:
+3. Update the `.env` file with your secrets:
+- `PORT` — server port
+- `FRONTEND_URL` — allowed frontend origin for CORS
+- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- `OPENAI_API_KEY` — OpenAI API key
+- `GOOGLE_MAPS_API_KEY` — public Google Maps key for frontend map rendering
+- `OPENWEATHER_API_KEY` — OpenWeather API key
+
+4. Start the development server:
 ```bash
 npm run dev
 # or
@@ -48,7 +56,25 @@ pnpm dev
 ```
 
 The server will start on `http://localhost:3001`
+## Deploying to Render
 
+Use a Render Web Service for the backend and configure the service as follows:
+
+- Root Directory: `.sixth copy`
+- Build Command: `npm ci && npm run build`
+- Start Command: `npm start`
+- Health Check Path: `/health`
+
+Add the required environment variables in Render settings:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `OPENAI_API_KEY`
+- `GOOGLE_MAPS_API_KEY`
+- `OPENWEATHER_API_KEY`
+- `FRONTEND_URL`
+
+Render will provide `PORT` automatically, and the app is already configured to use `process.env.PORT`.
 ### Build for Production
 
 ```bash

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: supplysense-backend
+    env: node
+    branch: main
+    plan: starter
+    buildCommand: npm ci && npm run build && cd ".sixth copy" && npm ci && npm run build
+    startCommand: cd ".sixth copy" && npm start
+    healthCheckPath: /health
+    autoDeploy: true

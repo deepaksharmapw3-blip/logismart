@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 
+// Load environment variables from the backend project root
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+
 // Import routes
 import shipmentsRouter from './routes/shipments';
 import predictionsRouter from './routes/predictions';

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_KEY = process.env.OPENWEATHER_API_KEY;
+const API_KEY = process.env.OPENWEATHER_API_KEY || process.env.WEATHER_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 export interface WeatherData {
@@ -27,7 +27,7 @@ export async function getCurrentWeather(
   lon: number
 ): Promise<WeatherData | null> {
   if (!API_KEY) {
-    console.warn('OpenWeather API key not configured');
+    console.warn('OpenWeather API key not configured. Set OPENWEATHER_API_KEY or WEATHER_API_KEY.');
     return null;
   }
 

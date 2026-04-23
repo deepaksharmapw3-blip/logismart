@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
 
 const router = Router();
 
@@ -11,7 +11,11 @@ router.get('/', (req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
-      googleMapsApiKey: process.env.VITE_GOOGLE_MAPS_API_KEY || '',
+      googleMapsApiKey:
+        process.env.GOOGLE_MAPS_API_KEY ||
+        process.env.MAPS_API_KEY ||
+        process.env.VITE_GOOGLE_MAPS_API_KEY ||
+        '',
     },
     timestamp: new Date().toISOString(),
   });
