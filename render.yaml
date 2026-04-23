@@ -2,9 +2,10 @@ services:
   - type: web
     name: supplysense-backend
     env: node
+    rootDir: ".sixth copy"
     branch: main
     plan: starter
-    buildCommand: npm ci && npm run build && cd ".sixth copy" && npm ci && npm run build
-    startCommand: cd ".sixth copy" && npm start
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
     healthCheckPath: /health
     autoDeploy: true
