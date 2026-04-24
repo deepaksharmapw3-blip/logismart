@@ -1,0 +1,94 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables (CRITICAL - contains API keys)
+.env
+.env.local
+.env.production
+.env.development
+.env*.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Optional REPL history
+.node_repl_history
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional STYLELINT cache
+.stylelintcache
+
+# tmp files
+tmp/
+temp/
+
+# Backend specific
+.sixth/node_modules/
+.sixth/dist/
+
+# Frontend specific (if exists at root)
+src/node_modules/
+
+# Separate projects
+logismart/
+
+# Test files
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Documentation (optional - uncomment if you don't want to push docs)
+# *.md
+# docs/
