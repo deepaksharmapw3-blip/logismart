@@ -25,7 +25,7 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
       // Fetch API key from backend
       let apiKey: string;
       try {
-        const response = await fetch('http://localhost:3001/api/config');
+        const response = await fetch('http://https://logismart-5.onrender.com/api/config');
         const config = await response.json();
         apiKey = config.data?.googleMapsApiKey;
         

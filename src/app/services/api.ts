@@ -1,5 +1,5 @@
 // API Service for connecting to the backend
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'https://logismart-5.onrender.com/api';
 
 // Generic fetch wrapper
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {

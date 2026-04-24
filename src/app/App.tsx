@@ -152,7 +152,7 @@ export default function App() {
           <h2 className="text-red-700 font-semibold mb-2">Error Loading Data</h2>
           <p className="text-red-600">{error}</p>
           <p className="text-sm text-red-500 mt-2">
-            Make sure the backend server is running on http://localhost:3001
+            Make sure the backend server is running on https://logismart-5.onrender.com
           </p>
         </div>
       </div>

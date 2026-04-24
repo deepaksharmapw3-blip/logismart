@@ -27,7 +27,7 @@ export function WeatherWidget({ lat, lon }: WeatherWidgetProps) {
     const fetchWeather = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/weather/current?lat=${lat}&lon=${lon}`
+          https://logismart-5.onrender.com/api/weather/current?lat=${lat}&lon=${lon}`
         );
         if (response.ok) {
           const data = await response.json();
