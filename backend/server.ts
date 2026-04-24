@@ -87,23 +87,9 @@ app.get('/debug/memory', (req: Request, res: Response) => {
 });
 
 // Serve frontend static files (production build)
-const frontendDistPath = path.join(__dirname, '..', '..', 'dist');
-app.use(express.static(frontendDistPath));
-
-// Serve frontend for all non-API routes (SPA support)
-app.get('*', (req: Request, res: Response) => {
-  // Don't serve index.html for API routes
-  if (req.path.startsWith('/api/') || req.path.startsWith('/health') || req.path.startsWith('/debug')) {
-    return res.status(404).json({
-      success: false,
-      error: 'Endpoint not found',
-      path: req.path,
-      timestamp: new Date().toISOString(),
-    });
-  }
-  res.sendFile(path.join(frontendDistPath, 'index.html'));
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is running 🚀" });
 });
-
 // Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', err);
