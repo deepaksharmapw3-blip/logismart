@@ -23,11 +23,7 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
   useEffect(() => {
     const loadGoogleMaps = async () => {
       // Fetch API key from backend
-      let apiKey: string;
-      try {
-        const response = await fetch('https://logismart-5.onrender.com/api/config');
-        const config = await response.json();
-        apiKey = config.data?.googleMapsApiKey;
+     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         
         if (!apiKey) {
           console.error('Google Maps API key not found in backend config');
