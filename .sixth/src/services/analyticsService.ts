@@ -1,12 +1,12 @@
-import { Shipment, DelayPrediction, AnalyticsData } from '../types';
+import { Shipment, DelayPrediction, AnalyticsData, RiskLevel, Bottleneck, StatMetric } from '../types';
 import { DataStore } from '../data';
 
 export class AnalyticsService {
   /**
    * Calculate delivery trends for the last 7 days
    */
-  static calculateDeliveryTrends() {
-    const shipments = DataStore.getAllShipments();
+  static async calculateDeliveryTrends() {
+    const shipments = await DataStore.getAllShipments();
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const today = new Date();
     
@@ -37,8 +37,8 @@ export class AnalyticsService {
   /**
    * Calculate delay reasons from predictions
    */
-  static calculateDelayReasons() {
-    const predictions = DataStore.getAllPredictions();
+  static async calculateDelayReasons() {
+    const predictions = await DataStore.getAllPredictions();
     const reasonsMap = new Map<string, number>();
     const colorMap: Record<string, string> = {
       'Traffic': '#ef4444',
@@ -77,8 +77,8 @@ export class AnalyticsService {
   /**
    * Calculate route performance metrics
    */
-  static calculateRoutePerformance() {
-    const predictions = DataStore.getAllPredictions();
+  static async calculateRoutePerformance() {
+    const predictions = await DataStore.getAllPredictions();
     const routeMap = new Map<string, { total: number; delays: number }>();
     
     predictions.forEach(pred => {
@@ -108,8 +108,8 @@ export class AnalyticsService {
   /**
    * Identify bottlenecks from shipment data
    */
-  static identifyBottlenecks() {
-    const shipments = DataStore.getAllShipments();
+  static async identifyBottlenecks(): Promise<Bottleneck[]> {
+    const shipments = await DataStore.getAllShipments();
     const locationMap = new Map<string, { delays: number; total: number }>();
     
     shipments.forEach(ship => {
@@ -128,7 +128,7 @@ export class AnalyticsService {
         return {
           location,
           delay: delayPercent,
-          severity: delayPercent >= 50 ? 'high' : delayPercent >= 25 ? 'medium' : 'low',
+          severity: (delayPercent >= 50 ? 'high' : delayPercent >= 25 ? 'medium' : 'low') as RiskLevel,
         };
       })
       .sort((a, b) => b.delay - a.delay)
@@ -143,9 +143,9 @@ export class AnalyticsService {
   /**
    * Calculate overall statistics
    */
-  static calculateStats() {
-    const shipments = DataStore.getAllShipments();
-    const predictions = DataStore.getAllPredictions();
+  static async calculateStats(): Promise<StatMetric[]> {
+    const shipments = await DataStore.getAllShipments();
+    const predictions = await DataStore.getAllPredictions();
     
     const totalShipments = shipments.length;
     const onTimeShipments = shipments.filter(s => s.status === 'on-time').length;
@@ -176,10 +176,10 @@ export class AnalyticsService {
     });
     const lastDayOnTime = lastDayShipments.filter(s => s.status === 'on-time').length;
     
-    const shipmentTrend = totalShipments > 20 ? 'up' : totalShipments > 10 ? 'up' : 'down';
-    const onTimeTrend = lastDayOnTime > 0 ? 'up' : 'down';
-    const delayTrend = avgDelay > 20 ? 'up' : 'down';
-    const criticalTrend = highRiskPredictions > 5 ? 'up' : 'down';
+    const shipmentTrend: 'up' | 'down' = totalShipments > 20 ? 'up' : totalShipments > 10 ? 'up' : 'down';
+    const onTimeTrend: 'up' | 'down' = lastDayOnTime > 0 ? 'up' : 'down';
+    const delayTrend: 'up' | 'down' = avgDelay > 20 ? 'up' : 'down';
+    const criticalTrend: 'up' | 'down' = highRiskPredictions > 5 ? 'up' : 'down';
     
     return [
       {
@@ -214,11 +214,11 @@ export class AnalyticsService {
    */
   static async generateAnalytics(): Promise<AnalyticsData> {
     return {
-      deliveryTrends: this.calculateDeliveryTrends(),
-      delayReasons: this.calculateDelayReasons(),
-      routePerformance: this.calculateRoutePerformance(),
-      bottlenecks: this.identifyBottlenecks(),
-      stats: this.calculateStats(),
+      deliveryTrends: await this.calculateDeliveryTrends(),
+      delayReasons: await this.calculateDelayReasons(),
+      routePerformance: await this.calculateRoutePerformance(),
+      bottlenecks: await this.identifyBottlenecks(),
+      stats: await this.calculateStats(),
     };
   }
 }

@@ -81,7 +81,9 @@ router.post('/generate-missing', async (req: Request, res: Response) => {
         },
       });
       
-      generated.push(routeOpt);
+      if (routeOpt) {
+        generated.push(routeOpt);
+      }
     }
     
     const response: ApiResponse<{ generated: number; routes: RouteOptimization[] }> = {
