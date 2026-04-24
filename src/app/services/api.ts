@@ -187,6 +187,9 @@ export const api = {
     recentTrends: AnalyticsData['deliveryTrends'];
     topBottlenecks: AnalyticsData['bottlenecks'];
   }>('/analytics/dashboard'),
+
+  // Config
+  getConfig: () => fetchApi<{ googleMapsApiKey: string }>('/config'),
 };
 
 export default api;

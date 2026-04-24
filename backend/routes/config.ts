@@ -11,7 +11,7 @@ router.get('/', (req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
-      googleMapsApiKey: process.env.VITE_GOOGLE_MAPS_API_KEY || '',
+      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '',
     },
     timestamp: new Date().toISOString(),
   });

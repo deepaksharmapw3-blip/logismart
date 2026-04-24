@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { api } from '../services/api';
 
 interface Shipment {
   id: string;
@@ -22,89 +23,91 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
   // Load Google Maps script
   useEffect(() => {
     const loadGoogleMaps = async () => {
-      // Fetch API key from backend
-     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        
+      try {
+        // Fetch API key from backend
+        const config = await api.getConfig();
+        const apiKey = config.googleMapsApiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
         if (!apiKey) {
           console.error('Google Maps API key not found in backend config');
           setLoadError('API key not configured');
           setIsLoading(false);
           return;
         }
+
+        // Check if script already exists
+        if (document.querySelector(`script[src*="maps.googleapis.com"]`)) {
+          setIsLoading(false);
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          console.log('Google Maps script loaded successfully');
+          if (mapRef.current && window.google) {
+            try {
+              const newMap = new window.google.maps.Map(mapRef.current, {
+                center: { lat: 39.8283, lng: -98.5795 }, // Center of USA
+                zoom: 4,
+                styles: [
+                  {
+                    featureType: 'all',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#1a1a2e' }]
+                  },
+                  {
+                    featureType: 'all',
+                    elementType: 'labels.text.stroke',
+                    stylers: [{ color: '#1a1a2e' }]
+                  },
+                  {
+                    featureType: 'all',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#ffffff' }]
+                  },
+                  {
+                    featureType: 'water',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#0f0f23' }]
+                  },
+                  {
+                    featureType: 'road',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#2d2d44' }]
+                  }
+                ],
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+              });
+              setMap(newMap);
+              setIsLoading(false);
+              console.log('Google Map initialized successfully');
+            } catch (err) {
+              console.error('Error initializing Google Map:', err);
+              setLoadError('Failed to initialize map');
+              setIsLoading(false);
+            }
+          } else {
+            setLoadError('Google Maps not available');
+            setIsLoading(false);
+          }
+        };
+        script.onerror = () => {
+          console.error('Failed to load Google Maps script');
+          setLoadError('Failed to load Google Maps');
+          setIsLoading(false);
+        };
+        document.head.appendChild(script);
       } catch (error) {
         console.error('Failed to fetch config from backend:', error);
         setLoadError('Failed to load configuration');
         setIsLoading(false);
         return;
       }
-
-      // Check if script already exists
-      if (document.querySelector(`script[src*="maps.googleapis.com"]`)) {
-        setIsLoading(false);
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        console.log('Google Maps script loaded successfully');
-        if (mapRef.current && window.google) {
-          try {
-            const newMap = new window.google.maps.Map(mapRef.current, {
-              center: { lat: 39.8283, lng: -98.5795 }, // Center of USA
-              zoom: 4,
-              styles: [
-                {
-                  featureType: 'all',
-                  elementType: 'geometry',
-                  stylers: [{ color: '#1a1a2e' }]
-                },
-                {
-                  featureType: 'all',
-                  elementType: 'labels.text.stroke',
-                  stylers: [{ color: '#1a1a2e' }]
-                },
-                {
-                  featureType: 'all',
-                  elementType: 'labels.text.fill',
-                  stylers: [{ color: '#ffffff' }]
-                },
-                {
-                  featureType: 'water',
-                  elementType: 'geometry',
-                  stylers: [{ color: '#0f0f23' }]
-                },
-                {
-                  featureType: 'road',
-                  elementType: 'geometry',
-                  stylers: [{ color: '#2d2d44' }]
-                }
-              ],
-              mapTypeControl: false,
-              streetViewControl: false,
-              fullscreenControl: false
-            });
-            setMap(newMap);
-            setIsLoading(false);
-            console.log('Google Map initialized successfully');
-          } catch (err) {
-            console.error('Error initializing Google Map:', err);
-            setLoadError('Failed to initialize map');
-            setIsLoading(false);
-          }
-        } else {
-          setLoadError('Google Maps not available');
-          setIsLoading(false);
-        }
-      };
-      script.onerror = () => {
-        console.error('Failed to load Google Maps script');
-        setLoadError('Failed to load Google Maps');
-        setIsLoading(false);
-      };
-      document.head.appendChild(script);
 
       return () => {
         // Cleanup markers
@@ -136,8 +139,8 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
         icon: {
           path: window.google.maps.SymbolPath.CIRCLE,
           scale: 12,
-          fillColor: shipment.status === 'on-time' ? '#10b981' : 
-                     shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
+          fillColor: shipment.status === 'on-time' ? '#10b981' :
+            shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
           fillOpacity: 1,
           strokeWeight: 3,
           strokeColor: '#ffffff'
@@ -180,16 +183,16 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
       const routePath = new window.google.maps.Polyline({
         path: [shipment.location, shipment.destination],
         geodesic: true,
-        strokeColor: shipment.status === 'on-time' ? '#10b981' : 
-                     shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
+        strokeColor: shipment.status === 'on-time' ? '#10b981' :
+          shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
         strokeOpacity: 0.8,
         strokeWeight: 3,
         icons: [{
           icon: {
             path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
             scale: 3,
-            fillColor: shipment.status === 'on-time' ? '#10b981' : 
-                       shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
+            fillColor: shipment.status === 'on-time' ? '#10b981' :
+              shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
             fillOpacity: 1,
             strokeWeight: 1
           },
@@ -207,8 +210,8 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
           icon: {
             path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
             scale: 3,
-            fillColor: shipment.status === 'on-time' ? '#10b981' : 
-                       shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
+            fillColor: shipment.status === 'on-time' ? '#10b981' :
+              shipment.status === 'at-risk' ? '#f59e0b' : '#ef4444',
             fillOpacity: 1,
             strokeWeight: 1
           },
@@ -266,7 +269,7 @@ export function GoogleMap({ shipments, onShipmentClick }: GoogleMapProps) {
         </div>
       )}
       <div ref={mapRef} className="w-full h-full rounded-xl" />
-      
+
       {/* Legend */}
       <div className="absolute top-4 left-4 glass-card rounded-lg p-3 z-10">
         <div className="text-xs font-medium mb-2 text-white">Status Legend</div>
