@@ -8,7 +8,7 @@ import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import { ShipmentList } from "./components/ShipmentList";
 import { AddShipmentForm } from "./components/AddShipmentForm";
 import { ShipmentDetail } from "./components/ShipmentDetail";
-import AIConsultant from "./components/AIConsultant";
+import { AIConsultant } from "./components/AIConsultant";
 import { api, type Shipment, type DelayPrediction, type RouteOptimization, type Alert } from "./services/api";
 import {
   Package,
@@ -255,8 +255,8 @@ export default function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center gap-2 px-6 py-3 rounded-t-xl transition-all duration-300 ${isActive
-                      ? "bg-white/10 text-white border-t border-x border-white/20 shadow-lg"
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                    ? "bg-white/10 text-white border-t border-x border-white/20 shadow-lg"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
                     }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : ''}`} />
@@ -417,6 +417,12 @@ export default function App() {
               </p>
             </div>
             <AnalyticsDashboard />
+          </div>
+        )}
+
+        {activeTab === "ai-consultant" && (
+          <div>
+            <AIConsultant />
           </div>
         )}
       </main>

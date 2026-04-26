@@ -186,11 +186,11 @@ export async function getAIRecommendations(): Promise<AIRecommendation[]> {
       messages: [
         {
           role: 'system',
-          content: 'You are a logistics optimization AI. Provide 3 proactive recommendations for supply chain improvement. Respond with JSON array of objects.'
+          content: 'You are a logistics optimization AI. Provide proactive recommendations for supply chain improvement. Respond with a JSON object containing a "recommendations" key with an array of 3 recommendation objects.'
         },
         {
           role: 'user',
-          content: 'Generate 3 recommendations for a supply chain experiencing weather-related delays and port congestion. Format as JSON array: [{ "type": "route|operational|strategic", "title": "...", "description": "...", "expectedBenefit": "...", "priority": "high|medium|low" }]'
+          content: 'Generate 3 recommendations for a supply chain experiencing weather-related delays and port congestion. Format as JSON: { "recommendations": [{ "type": "route" | "operational" | "strategic", "title": "...", "description": "...", "expectedBenefit": "...", "priority": "high" | "medium" | "low" }] }'
         }
       ],
       response_format: { type: "json_object" }
@@ -216,11 +216,11 @@ export async function getAISystemInsights(systemStats: any): Promise<AISystemIns
       messages: [
         {
           role: 'system',
-          content: 'You are a strategic supply chain analyst. Analyze the system statistics and provide high-level insights. Respond with JSON.'
+          content: 'You are a strategic supply chain analyst. Analyze the system statistics and provide high-level insights. Respond with a JSON object.'
         },
         {
           role: 'user',
-          content: `Stats: ${JSON.stringify(systemStats)}\nProvide a summary, bottleneck analysis, overall efficiency score (0-100), and strategic advice. Format as JSON.`
+          content: `Stats: ${JSON.stringify(systemStats)}\nProvide a summary, bottleneck analysis, overall efficiency score (0-100), and strategic advice. Format as JSON: { "summary": "...", "bottlenecks": [{ "location": "...", "impact": "...", "suggestion": "..." }], "efficiencyScore": 85, "strategicAdvice": "..." }`
         }
       ],
       response_format: { type: "json_object" }
