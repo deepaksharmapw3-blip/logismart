@@ -91,7 +91,7 @@ export function AIConsultant() {
                     </div>
 
                     <div className="space-y-4">
-                        {recommendations.map((rec, idx) => (
+                        {recommendations?.map((rec, idx) => (
                             <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, x: -20 }}
@@ -101,8 +101,8 @@ export function AIConsultant() {
                             >
                                 <div className="flex items-start gap-4">
                                     <div className={`p-3 rounded-xl ${rec.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                                            rec.priority === 'medium' ? 'bg-amber-500/20 text-amber-400' :
-                                                'bg-emerald-500/20 text-emerald-400'
+                                        rec.priority === 'medium' ? 'bg-amber-500/20 text-amber-400' :
+                                            'bg-emerald-500/20 text-emerald-400'
                                         }`}>
                                         {rec.type === 'route' ? <TrendingUp className="w-6 h-6" /> :
                                             rec.type === 'operational' ? <Activity className="w-6 h-6" /> :
@@ -112,8 +112,8 @@ export function AIConsultant() {
                                         <div className="flex items-center justify-between mb-1">
                                             <h3 className="font-bold text-lg text-white group-hover:text-indigo-300 transition-colors">{rec.title}</h3>
                                             <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${rec.priority === 'high' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                                    rec.priority === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                                        'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                                rec.priority === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                                    'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                                                 }`}>
                                                 {rec.priority} Priority
                                             </span>
@@ -154,7 +154,7 @@ export function AIConsultant() {
                             <div className="border-t border-white/10 pt-6">
                                 <div className="text-sm text-white/40 mb-4 uppercase tracking-widest font-bold">Bottleneck Watch</div>
                                 <div className="space-y-4">
-                                    {insights?.bottlenecks.map((b, idx) => (
+                                    {insights?.bottlenecks?.map((b: any, idx: number) => (
                                         <div key={idx} className="p-3 bg-white/5 rounded-xl border border-white/10">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <AlertTriangle className="w-4 h-4 text-amber-400" />
