@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { AlertTriangle, Clock, MapPin, TrendingUp, ChevronRight } from 'lucide-react';
+import { AlertTriangle, Clock, MapPin, TrendingUp, ChevronRight, Brain, Zap } from 'lucide-react';
 
 interface Prediction {
   shipmentId: string;
@@ -110,17 +110,29 @@ export function DelayPredictionCard({ prediction, onViewDetails }: DelayPredicti
 
       {/* AI Explanation */}
       {prediction.explanation && (
-        <div className="mb-4 p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-          <div className="text-sm font-medium text-indigo-300 mb-1">AI Analysis</div>
-          <div className="text-sm text-white/70">{prediction.explanation}</div>
+        <div className="mb-4 p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/30 relative overflow-hidden">
+          <div className="absolute -right-2 -top-2 opacity-10">
+            <Brain className="w-8 h-8 text-indigo-400" />
+          </div>
+          <div className="text-sm font-bold text-indigo-300 mb-1 flex items-center gap-1.5">
+            <Brain className="w-3.5 h-3.5" />
+            AI Analysis
+          </div>
+          <div className="text-sm text-white/80 leading-relaxed italic">"{prediction.explanation}"</div>
         </div>
       )}
 
       {/* AI Decision Suggestion */}
       {prediction.decisionSuggestion && (
-        <div className="mb-4 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-          <div className="text-sm font-medium text-emerald-300 mb-1">Suggested Action</div>
-          <div className="text-sm text-white/70">{prediction.decisionSuggestion}</div>
+        <div className="mb-4 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/30 relative overflow-hidden">
+          <div className="absolute -right-2 -top-2 opacity-10">
+            <Zap className="w-8 h-8 text-emerald-400" />
+          </div>
+          <div className="text-sm font-bold text-emerald-300 mb-1 flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5" />
+            Suggested Action
+          </div>
+          <div className="text-sm text-white/80 leading-relaxed font-medium">{prediction.decisionSuggestion}</div>
         </div>
       )}
 

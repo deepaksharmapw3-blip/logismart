@@ -13,6 +13,7 @@ import alertsRouter from './routes/alerts';
 import analyticsRouter from './routes/analytics';
 import weatherRouter from './routes/weather';
 import configRouter from './routes/config';
+import aiRouter from './routes/ai';
 import MemoryStore from './data/store';
 
 // Load environment variables
@@ -72,17 +73,37 @@ app.use('/api/alerts', alertsRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/weather', weatherRouter);
 app.use('/api/config', configRouter);
+app.use('/api/ai', aiRouter);
 
-// Debug endpoint - check memory store
-app.get('/debug/memory', (req: Request, res: Response) => {
+// Debug endpoint - check memory store and supabase status
+// Import types and data store for debug
+import { DataStore as UnifiedStore, supabaseWorking } from './data';
+
+app.get('/debug/status', async (req: Request, res: Response) => {
+  const unifiedShipments = await UnifiedStore.getAllShipments();
+  const memoryShipments = MemoryStore.getAllShipments();
+
   res.json({
-    shipments: MemoryStore.getAllShipments().length,
-    predictions: MemoryStore.getAllPredictions().length,
-    routes: MemoryStore.getAllRouteOptimizations().length,
-    alerts: MemoryStore.getAllAlerts().length,
-    shipmentIds: MemoryStore.getAllShipments().map(s => s.id),
-    predictionIds: MemoryStore.getAllPredictions().map(p => p.shipmentId),
-    routeIds: MemoryStore.getAllRouteOptimizations().map(r => r.shipmentId),
+    supabase: {
+      configured: !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY),
+      working: supabaseWorking,
+      url: process.env.SUPABASE_URL,
+    },
+    counts: {
+      unified: {
+        shipments: unifiedShipments.length,
+      },
+      memory: {
+        shipments: memoryShipments.length,
+        predictions: MemoryStore.getAllPredictions().length,
+        routes: MemoryStore.getAllRouteOptimizations().length,
+        alerts: MemoryStore.getAllAlerts().length,
+      }
+    },
+    shipmentIds: {
+      unified: unifiedShipments.map(s => s.id),
+      memory: memoryShipments.map(s => s.id),
+    }
   });
 });
 

@@ -24,6 +24,33 @@ export interface AIPredictionResult {
   };
 }
 
+export interface AIDecisionResult {
+  shipmentId: string;
+  decision: string;
+  rationale: string;
+  actions: string[];
+  impact: string;
+}
+
+export interface AIRecommendation {
+  type: 'route' | 'operational' | 'strategic';
+  title: string;
+  description: string;
+  expectedBenefit: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
+export interface AISystemInsights {
+  summary: string;
+  bottlenecks: {
+    location: string;
+    impact: string;
+    suggestion: string;
+  }[];
+  efficiencyScore: number;
+  strategicAdvice: string;
+}
+
 export async function generateAIPrediction(
   origin: string,
   destination: string,
@@ -32,7 +59,7 @@ export async function generateAIPrediction(
   weather?: WeatherData | null
 ): Promise<AIPredictionResult | null> {
   console.log('OpenAI: Starting prediction for route:', origin, '->', destination);
-  
+
   if (!apiKey || apiKey === 'dummy-key') {
     console.warn('OpenAI API key not configured, using fallback prediction');
     return null;
@@ -40,7 +67,7 @@ export async function generateAIPrediction(
 
   try {
     console.log('OpenAI: Calling API...');
-    
+
     let weatherContext = '';
     if (weather) {
       weatherContext = `\nCurrent Weather Conditions at ${currentLocation}:\n` +
@@ -50,7 +77,7 @@ export async function generateAIPrediction(
         `- Visibility: ${(weather.visibility / 1000).toFixed(1)} km\n` +
         `- Humidity: ${weather.humidity}%`;
     }
-    
+
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
@@ -101,7 +128,7 @@ export async function generateAIPrediction(
 
     const result = JSON.parse(jsonMatch[0]) as AIPredictionResult;
     console.log('OpenAI: Parsed result:', result);
-    
+
     // Validate the response
     if (typeof result.riskScore !== 'number' || result.riskScore < 0 || result.riskScore > 100) {
       console.error('Invalid risk score from OpenAI:', result.riskScore);
@@ -112,6 +139,96 @@ export async function generateAIPrediction(
     return result;
   } catch (error) {
     console.error('OpenAI API error:', error);
+    return null;
+  }
+}
+
+export async function getAIDecision(
+  shipmentId: string,
+  shipmentData: any
+): Promise<AIDecisionResult | null> {
+  console.log('OpenAI: Generating decision for shipment:', shipmentId);
+
+  if (!apiKey || apiKey === 'dummy-key') return null;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a senior supply chain consultant. Provide a professional decision and action plan for the given shipment data. Respond with JSON.'
+        },
+        {
+          role: 'user',
+          content: `Data: ${JSON.stringify(shipmentData)}\nGenerate a decision, rationale, action items, and expected impact. Format as JSON: { "decision": "...", "rationale": "...", "actions": ["...", "..."], "impact": "..." }`
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{}');
+    return { shipmentId, ...result };
+  } catch (error) {
+    console.error('getAIDecision error:', error);
+    return null;
+  }
+}
+
+export async function getAIRecommendations(): Promise<AIRecommendation[]> {
+  console.log('OpenAI: Generating system-wide recommendations');
+
+  if (!apiKey || apiKey === 'dummy-key') return [];
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a logistics optimization AI. Provide 3 proactive recommendations for supply chain improvement. Respond with JSON array of objects.'
+        },
+        {
+          role: 'user',
+          content: 'Generate 3 recommendations for a supply chain experiencing weather-related delays and port congestion. Format as JSON array: [{ "type": "route|operational|strategic", "title": "...", "description": "...", "expectedBenefit": "...", "priority": "high|medium|low" }]'
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const content = response.choices[0].message.content || '{"recommendations": []}';
+    const data = JSON.parse(content);
+    return data.recommendations || [];
+  } catch (error) {
+    console.error('getAIRecommendations error:', error);
+    return [];
+  }
+}
+
+export async function getAISystemInsights(systemStats: any): Promise<AISystemInsights | null> {
+  console.log('OpenAI: Generating strategic system insights');
+
+  if (!apiKey || apiKey === 'dummy-key') return null;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a strategic supply chain analyst. Analyze the system statistics and provide high-level insights. Respond with JSON.'
+        },
+        {
+          role: 'user',
+          content: `Stats: ${JSON.stringify(systemStats)}\nProvide a summary, bottleneck analysis, overall efficiency score (0-100), and strategic advice. Format as JSON.`
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    console.error('getAISystemInsights error:', error);
     return null;
   }
 }

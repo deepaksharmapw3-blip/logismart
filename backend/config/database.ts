@@ -36,16 +36,23 @@ export const supabase: SupabaseClient = supabaseInstance as SupabaseClient;
 // Test database connection
 export const testConnection = async (): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabaseInstance) {
+    console.log('⚠️ Supabase not configured, skipping connection test');
     return false;
   }
 
   try {
-    const { data, error } = await supabaseInstance.from('shipments').select('count').limit(1);
-    if (error) throw error;
+    // Correct way to check for table existence and connectivity in Supabase
+    const { error } = await supabaseInstance.from('shipments').select('*', { count: 'exact', head: true }).limit(1);
+
+    if (error) {
+      console.error('❌ Supabase connection test failed:', error.message);
+      return false;
+    }
+
     console.log('✅ Supabase connection successful');
     return true;
   } catch (error) {
-    console.error('❌ Supabase connection failed:', error);
+    console.error('❌ Supabase connection error:', error);
     return false;
   }
 };

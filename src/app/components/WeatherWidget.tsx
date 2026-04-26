@@ -19,6 +19,8 @@ interface WeatherWidgetProps {
   lon: number;
 }
 
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
+
 export function WeatherWidget({ lat, lon }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ export function WeatherWidget({ lat, lon }: WeatherWidgetProps) {
     const fetchWeather = async () => {
       try {
         const response = await fetch(
-          https://logismart-5.onrender.com/api/weather/current?lat=${lat}&lon=${lon}`
+          `${API_BASE_URL}/weather/current?lat=${lat}&lon=${lon}`
         );
         if (response.ok) {
           const data = await response.json();

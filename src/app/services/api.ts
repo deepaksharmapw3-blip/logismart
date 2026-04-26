@@ -119,6 +119,33 @@ export interface AnalyticsData {
   }>;
 }
 
+export interface AIDecision {
+  shipmentId: string;
+  decision: string;
+  rationale: string;
+  actions: string[];
+  impact: string;
+}
+
+export interface AIRecommendation {
+  type: 'route' | 'operational' | 'strategic';
+  title: string;
+  description: string;
+  expectedBenefit: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
+export interface AISystemInsights {
+  summary: string;
+  bottlenecks: Array<{
+    location: string;
+    impact: string;
+    suggestion: string;
+  }>;
+  efficiencyScore: number;
+  strategicAdvice: string;
+}
+
 // API Functions
 export const api = {
   // Shipments
@@ -190,6 +217,11 @@ export const api = {
 
   // Config
   getConfig: () => fetchApi<{ googleMapsApiKey: string }>('/config'),
+
+  // AI Features
+  getAIDecision: (shipmentId: string) => fetchApi<AIDecision>(`/ai/decisions/${shipmentId}`),
+  getAIRecommendations: () => fetchApi<AIRecommendation[]>('/ai/recommendations'),
+  getAISystemInsights: () => fetchApi<AISystemInsights>('/ai/insights'),
 };
 
 export default api;

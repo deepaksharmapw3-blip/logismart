@@ -3,7 +3,7 @@ import { DataStore as MemoryStore } from './store';
 import { SupabaseStore } from './supabaseStore';
 
 // Track if Supabase is actually working (not just configured)
-let supabaseWorking = false;
+export let supabaseWorking = false;
 
 // Test Supabase on startup
 testConnection().then(working => {
@@ -25,7 +25,7 @@ export const DataStore = {
   // Shipments
   getAllShipments: async (): Promise<Shipment[]> => {
     const memoryData = MemoryStore.getAllShipments();
-    
+
     if (supabaseWorking) {
       try {
         const supabaseData = await SupabaseStore.getAllShipments();
@@ -43,14 +43,14 @@ export const DataStore = {
     }
     return memoryData;
   },
-  
+
   getShipmentById: async (id: string): Promise<Shipment | undefined> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.getShipmentById(id);
     }
     return MemoryStore.getShipmentById(id);
   },
-  
+
   addShipment: async (shipment: Omit<Shipment, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }): Promise<Shipment | null> => {
     if (supabaseWorking) {
       try {
@@ -63,14 +63,14 @@ export const DataStore = {
     console.log('Using memory store for addShipment');
     return MemoryStore.addShipment(shipment);
   },
-  
+
   updateShipment: async (id: string, updates: Parameters<typeof MemoryStore.updateShipment>[1]): Promise<Shipment | undefined> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.updateShipment(id, updates);
     }
     return MemoryStore.updateShipment(id, updates);
   },
-  
+
   deleteShipment: async (id: string): Promise<boolean> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.deleteShipment(id);
@@ -82,7 +82,7 @@ export const DataStore = {
   getAllPredictions: async (): Promise<DelayPrediction[]> => {
     const memoryData = MemoryStore.getAllPredictions();
     console.log(`DEBUG getAllPredictions: memoryData=${memoryData.length}, supabaseWorking=${supabaseWorking}`);
-    
+
     // Temporarily disable Supabase for predictions until tables are created
     // if (supabaseWorking) {
     //   try {
@@ -101,21 +101,21 @@ export const DataStore = {
     // }
     return memoryData;
   },
-  
+
   getPredictionByShipmentId: async (shipmentId: string): Promise<DelayPrediction | undefined> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.getPredictionByShipmentId(shipmentId);
     }
     return MemoryStore.getPredictionByShipmentId(shipmentId);
   },
-  
+
   getHighRiskPredictions: async (): Promise<DelayPrediction[]> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.getHighRiskPredictions();
     }
     return MemoryStore.getHighRiskPredictions();
   },
-  
+
   addPrediction: async (prediction: Parameters<typeof MemoryStore.addPrediction>[0]): Promise<DelayPrediction | null> => {
     console.log(`DEBUG addPrediction: supabaseWorking=${supabaseWorking}`);
     if (supabaseWorking) {
@@ -136,7 +136,7 @@ export const DataStore = {
   getAllRouteOptimizations: async (): Promise<RouteOptimization[]> => {
     const memoryData = MemoryStore.getAllRouteOptimizations();
     console.log(`DEBUG getAllRouteOptimizations: memoryData=${memoryData.length}, supabaseWorking=${supabaseWorking}`);
-    
+
     // Temporarily disable Supabase for routes until tables are created
     // if (supabaseWorking) {
     //   try {
@@ -155,14 +155,14 @@ export const DataStore = {
     // }
     return memoryData;
   },
-  
+
   getRouteOptimizationByShipmentId: async (shipmentId: string): Promise<RouteOptimization | undefined> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.getRouteOptimizationByShipmentId(shipmentId);
     }
     return MemoryStore.getRouteOptimizationByShipmentId(shipmentId);
   },
-  
+
   addRouteOptimization: async (optimization: Omit<RouteOptimization, 'createdAt'>): Promise<RouteOptimization | null> => {
     console.log(`DEBUG addRouteOptimization: supabaseWorking=${supabaseWorking}`);
     if (supabaseWorking) {
@@ -177,7 +177,7 @@ export const DataStore = {
     console.log('Using memory store for addRouteOptimization');
     return MemoryStore.addRouteOptimization(optimization);
   },
-  
+
   applyRoute: async (shipmentId: string): Promise<boolean> => {
     // Try memory store first (where routes are actually stored)
     const memoryResult = MemoryStore.applyRoute(shipmentId);
@@ -185,7 +185,7 @@ export const DataStore = {
       console.log('Route applied from memory store:', shipmentId);
       return true;
     }
-    
+
     // Fallback to Supabase if not in memory
     if (isSupabaseConfigured()) {
       try {
@@ -195,14 +195,14 @@ export const DataStore = {
         console.warn('Supabase applyRoute failed:', error);
       }
     }
-    
+
     return false;
   },
 
   // Alerts
   getAllAlerts: async (): Promise<Alert[]> => {
     const memoryData = MemoryStore.getAllAlerts();
-    
+
     if (supabaseWorking) {
       try {
         const supabaseData = await SupabaseStore.getAllAlerts();
@@ -220,7 +220,7 @@ export const DataStore = {
     }
     return memoryData;
   },
-  
+
   getUnreadAlerts: async (): Promise<Alert[]> => {
     if (supabaseWorking) {
       try {
@@ -232,7 +232,7 @@ export const DataStore = {
     }
     return MemoryStore.getUnreadAlerts();
   },
-  
+
   addAlert: async (alert: Parameters<typeof MemoryStore.addAlert>[0]): Promise<Alert | null> => {
     if (supabaseWorking) {
       try {
@@ -244,14 +244,14 @@ export const DataStore = {
     }
     return MemoryStore.addAlert(alert);
   },
-  
+
   dismissAlert: async (id: string): Promise<boolean> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.dismissAlert(id);
     }
     return MemoryStore.dismissAlert(id);
   },
-  
+
   markAlertAsRead: async (id: string): Promise<boolean> => {
     if (isSupabaseConfigured()) {
       return SupabaseStore.markAlertAsRead(id);
@@ -266,7 +266,7 @@ export const DataStore = {
     }
     return MemoryStore.getAnalytics();
   },
-  
+
   updateStats: (newStats: Parameters<typeof MemoryStore.updateStats>[0]): void => {
     // Only available in memory store
     MemoryStore.updateStats(newStats);

@@ -8,6 +8,7 @@ import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import { ShipmentList } from "./components/ShipmentList";
 import { AddShipmentForm } from "./components/AddShipmentForm";
 import { ShipmentDetail } from "./components/ShipmentDetail";
+import AIConsultant from "./components/AIConsultant";
 import { api, type Shipment, type DelayPrediction, type RouteOptimization, type Alert } from "./services/api";
 import {
   Package,
@@ -18,25 +19,26 @@ import {
   Bell,
   Zap,
   Loader2,
+  Brain,
 } from "lucide-react";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<
-    "overview" | "predictions" | "routes" | "analytics"
+    "overview" | "predictions" | "routes" | "analytics" | "ai-consultant"
   >("overview");
-  
+
   // Data states
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [delayPredictions, setDelayPredictions] = useState<DelayPrediction[]>([]);
   const [routeOptimizations, setRouteOptimizations] = useState<RouteOptimization[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  
+
   // Selected shipment for detail view
   const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
-  
+
   // Track applied routes
   const [appliedRoutes, setAppliedRoutes] = useState<Set<string>>(new Set());
-  
+
   // Loading states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,26 +48,26 @@ export default function App() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const [shipmentsData, predictionsData, routesData, alertsData] = await Promise.all([
         api.getShipments(),
         api.getPredictions(),
         api.getRouteOptimizations(),
         api.getAlerts(),
       ]);
-      
+
       setShipments(shipmentsData);
       setDelayPredictions(predictionsData);
       setRouteOptimizations(routesData);
       setAlerts(alertsData);
-      
+
       console.log('Data refreshed:', {
         shipments: shipmentsData.length,
         predictions: predictionsData.length,
         routes: routesData.length,
         alerts: alertsData.length
       });
-      
+
       // Log prediction and route shipment IDs for debugging
       if (predictionsData.length > 0) {
         console.log('Prediction shipment IDs:', predictionsData.map(p => p.shipmentId));
@@ -76,13 +78,13 @@ export default function App() {
       if (shipmentsData.length > 0) {
         console.log('Shipment IDs:', shipmentsData.map(s => s.id));
       }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err instanceof Error ? err.message : "Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
-    };
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch data on mount
   useEffect(() => {
@@ -123,7 +125,7 @@ export default function App() {
       setAlerts(updatedAlerts);
       setRouteOptimizations(updatedRoutes);
       setAppliedRoutes(prev => new Set(prev).add(shipmentId));
-      
+
       // Show success notification
       const route = routeOptimizations.find(r => r.shipmentId === shipmentId);
       const savings = route?.suggestedRoute.savings || 'N/A';
@@ -185,6 +187,13 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setActiveTab('ai-consultant')}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full hover:bg-indigo-500/30 transition-all"
+              >
+                <Brain className="w-4 h-4 text-indigo-400" />
+                <span className="text-sm font-medium text-indigo-300">AI Insights</span>
+              </button>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full glow-success">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                 <span className="text-sm font-medium text-emerald-300">
@@ -233,6 +242,11 @@ export default function App() {
                 label: "Analytics",
                 icon: BarChart3,
               },
+              {
+                id: "ai-consultant",
+                label: "AI Consultant",
+                icon: Brain,
+              },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -240,11 +254,10 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-t-xl transition-all duration-300 ${
-                    isActive
+                  className={`flex items-center gap-2 px-6 py-3 rounded-t-xl transition-all duration-300 ${isActive
                       ? "bg-white/10 text-white border-t border-x border-white/20 shadow-lg"
                       : "text-white/60 hover:text-white hover:bg-white/5"
-                  }`}
+                    }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : ''}`} />
                   <span className={isActive ? 'font-medium' : ''}>{tab.label}</span>
@@ -257,9 +270,9 @@ export default function App() {
 
       {/* Shipment Detail Modal */}
       {selectedShipmentId && (
-        <ShipmentDetail 
-          shipmentId={selectedShipmentId} 
-          onClose={() => setSelectedShipmentId(null)} 
+        <ShipmentDetail
+          shipmentId={selectedShipmentId}
+          onClose={() => setSelectedShipmentId(null)}
         />
       )}
 
@@ -269,41 +282,41 @@ export default function App() {
           <div className="space-y-6">
             {/* Add Shipment Form */}
             <AddShipmentForm onShipmentAdded={fetchData} />
-            
-            <div className="grid grid-cols-3 gap-6">
-            {/* Left Column - Shipment List */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="font-medium">
-                  Active Shipments
-                </h2>
-                <span className="text-sm text-muted-foreground">
-                  {shipments.length} total
-                </span>
-              </div>
-              <ShipmentList
-                shipments={shipments}
-                onSelectShipment={handleShipmentClick}
-              />
-            </div>
 
-            {/* Middle & Right Columns - Map */}
-            <div className="col-span-2">
-              <h2 className="font-medium mb-4">
-                Real-Time Tracking
-              </h2>
-              <div className="h-[700px]">
-                <GoogleMap
-                  shipments={shipments.map((s) => ({
-                    id: s.id,
-                    status: s.status,
-                    location: s.location,
-                    destination: s.destination_coords,
-                  }))}
-                  onShipmentClick={handleShipmentClick}
+            <div className="grid grid-cols-3 gap-6">
+              {/* Left Column - Shipment List */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-medium">
+                    Active Shipments
+                  </h2>
+                  <span className="text-sm text-muted-foreground">
+                    {shipments.length} total
+                  </span>
+                </div>
+                <ShipmentList
+                  shipments={shipments}
+                  onSelectShipment={handleShipmentClick}
                 />
               </div>
-            </div>
+
+              {/* Middle & Right Columns - Map */}
+              <div className="col-span-2">
+                <h2 className="font-medium mb-4">
+                  Real-Time Tracking
+                </h2>
+                <div className="h-[700px]">
+                  <GoogleMap
+                    shipments={shipments.map((s) => ({
+                      id: s.id,
+                      status: s.status,
+                      location: s.location,
+                      destination: s.destination_coords,
+                    }))}
+                    onShipmentClick={handleShipmentClick}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -320,7 +333,7 @@ export default function App() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <button 
+                <button
                   onClick={fetchData}
                   className="px-4 py-2 glass-card rounded-lg text-sm text-white hover:bg-white/10 transition-colors"
                 >
