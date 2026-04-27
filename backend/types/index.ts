@@ -33,6 +33,7 @@ export interface DelayPrediction {
   predictedAt: Date;
   explanation?: string;
   decisionSuggestion?: string;
+  weather?: any; // WeatherData from services/weather
 }
 
 // Route Optimization Types

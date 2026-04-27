@@ -50,6 +50,17 @@ export interface Shipment {
   updatedAt: string;
 }
 
+export interface WeatherData {
+  temperature: number;
+  feelsLike: number;
+  humidity: number;
+  description: string;
+  icon: string;
+  windSpeed: number;
+  visibility: number;
+  location: string;
+}
+
 export interface DelayPrediction {
   shipmentId: string;
   delayProbability: number;
@@ -60,6 +71,7 @@ export interface DelayPrediction {
   predictedAt: string;
   explanation?: string;
   decisionSuggestion?: string;
+  weather?: WeatherData;
 }
 
 export interface Route {
@@ -222,6 +234,11 @@ export const api = {
   getAIDecision: (shipmentId: string) => fetchApi<AIDecision>(`/ai/decisions/${shipmentId}`),
   getAIRecommendations: () => fetchApi<AIRecommendation[]>('/ai/recommendations'),
   getAISystemInsights: () => fetchApi<AISystemInsights>('/ai/insights'),
+  // Weather
+  getCurrentWeather: (lat: number, lon: number) =>
+    fetchApi<WeatherData>(`/weather/current?lat=${lat}&lon=${lon}`),
+  getWeatherForecast: (lat: number, lon: number) =>
+    fetchApi<WeatherData[]>(`/weather/forecast?lat=${lat}&lon=${lon}`),
 };
 
 export default api;

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { DataStore } from '../data';
 import { generateAIPrediction } from '../services/openai';
+import { getCurrentWeather } from '../services/weather';
 import type { ApiResponse, DelayPrediction } from '../types';
 
 const router = Router();
@@ -31,7 +32,7 @@ router.get('/high-risk', async (req: Request, res: Response) => {
 router.get('/:shipmentId', async (req: Request, res: Response) => {
   const { shipmentId } = req.params;
   const prediction = await DataStore.getPredictionByShipmentId(shipmentId);
-  
+
   if (!prediction) {
     return res.status(404).json({
       success: false,
@@ -39,7 +40,7 @@ router.get('/:shipmentId', async (req: Request, res: Response) => {
       timestamp: new Date().toISOString(),
     });
   }
-  
+
   const response: ApiResponse<DelayPrediction> = {
     success: true,
     data: prediction,
@@ -54,23 +55,27 @@ router.post('/generate-missing', async (req: Request, res: Response) => {
     const shipments = await DataStore.getAllShipments();
     const predictions = await DataStore.getAllPredictions();
     const existingPredictionIds = new Set(predictions.map(p => p.shipmentId));
-    
+
     const missingShipments = shipments.filter(s => !existingPredictionIds.has(s.id));
     const generated: DelayPrediction[] = [];
-    
+
     for (const shipment of missingShipments) {
       console.log('Generating prediction for missing shipment:', shipment.id);
-      
+
       let predictionData: Omit<DelayPrediction, 'predictedAt'>;
-      
+
+      console.log(`OpenAI: Fetching weather for shipment ${shipment.id} location: ${shipment.location.lat}, ${shipment.location.lng}`);
+      const weather = await getCurrentWeather(shipment.location.lat, shipment.location.lng);
+
       // Try AI prediction first
       const aiPrediction = await generateAIPrediction(
         shipment.origin,
         shipment.destination,
         shipment.currentLocation,
-        shipment.eta
+        shipment.eta,
+        weather
       );
-      
+
       if (aiPrediction) {
         predictionData = {
           shipmentId: shipment.id,
@@ -81,11 +86,12 @@ router.post('/generate-missing', async (req: Request, res: Response) => {
           currentLocation: shipment.currentLocation,
           explanation: aiPrediction.explanation,
           decisionSuggestion: aiPrediction.decisionSuggestion,
+          weather: weather,
         };
       } else {
         // Fallback
-        const riskLevel = shipment.delayProbability >= 70 ? 'high' : 
-                         shipment.delayProbability >= 40 ? 'medium' : 'low';
+        const riskLevel = shipment.delayProbability >= 70 ? 'high' :
+          shipment.delayProbability >= 40 ? 'medium' : 'low';
         predictionData = {
           shipmentId: shipment.id,
           delayProbability: shipment.delayProbability,
@@ -95,11 +101,11 @@ router.post('/generate-missing', async (req: Request, res: Response) => {
           currentLocation: shipment.currentLocation,
         };
       }
-      
+
       const newPrediction = await DataStore.addPrediction(predictionData);
       if (newPrediction) generated.push(newPrediction);
     }
-    
+
     const response: ApiResponse<{ generated: number; predictions: DelayPrediction[] }> = {
       success: true,
       data: { generated: generated.length, predictions: generated },
@@ -120,7 +126,7 @@ router.post('/generate-missing', async (req: Request, res: Response) => {
 // GET /api/predictions/stats/summary - Get prediction statistics
 router.get('/stats/summary', async (req: Request, res: Response) => {
   const predictions = await DataStore.getAllPredictions();
-  
+
   const stats = {
     totalAtRisk: predictions.length,
     highRisk: predictions.filter(p => p.riskLevel === 'high').length,
@@ -130,7 +136,7 @@ router.get('/stats/summary', async (req: Request, res: Response) => {
       predictions.reduce((sum, p) => sum + p.delayProbability, 0) / predictions.length
     ) : 0,
   };
-  
+
   const response: ApiResponse<typeof stats> = {
     success: true,
     data: stats,
