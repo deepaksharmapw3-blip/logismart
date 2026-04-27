@@ -73,9 +73,10 @@ router.get('/insights', async (req: Request, res: Response) => {
         const insights = await getAISystemInsights(analytics);
 
         if (!insights) {
+            console.error('AI: No insights generated and no fallback available');
             return res.status(500).json({
                 success: false,
-                error: 'Failed to generate AI insights',
+                error: 'AI Insights currently unavailable',
                 timestamp: new Date().toISOString(),
             });
         }

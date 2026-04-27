@@ -1,8 +1,11 @@
+import dotenv from 'dotenv';
+// Load environment variables before any other imports
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import path from 'path';
 
 // Import routes
@@ -15,9 +18,6 @@ import weatherRouter from './routes/weather';
 import configRouter from './routes/config';
 import aiRouter from './routes/ai';
 import MemoryStore from './data/store';
-
-// Load environment variables
-dotenv.config();
 
 // Create Express app
 const app = express();

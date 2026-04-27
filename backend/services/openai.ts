@@ -1,15 +1,24 @@
 import OpenAI from 'openai';
+import dotenv from 'dotenv';
 import type { WeatherData } from './weather';
+
+// Ensure environment variables are loaded
+dotenv.config();
 
 const apiKey = process.env.OPENAI_API_KEY;
 
 if (!apiKey) {
-  console.warn('OPENAI_API_KEY not found in environment variables');
+  console.warn('⚠️ OPENAI_API_KEY not found in environment variables. AI features will be disabled.');
 }
 
-const openai = new OpenAI({
-  apiKey: apiKey || 'dummy-key',
-});
+// Create OpenAI client - use a helper to ensure we're using the latest key
+const createOpenAIClient = () => {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || 'dummy-key',
+  });
+};
+
+const openai = createOpenAIClient();
 
 export interface AIPredictionResult {
   riskScore: number; // 0-100
@@ -208,7 +217,10 @@ export async function getAIRecommendations(): Promise<AIRecommendation[]> {
 export async function getAISystemInsights(systemStats: any): Promise<AISystemInsights | null> {
   console.log('OpenAI: Generating strategic system insights');
 
-  if (!apiKey || apiKey === 'dummy-key') return null;
+  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'dummy-key') {
+    console.warn('OpenAI: API key not configured, returning fallback insights');
+    return getFallbackInsights();
+  }
 
   try {
     const response = await openai.chat.completions.create({
@@ -226,9 +238,30 @@ export async function getAISystemInsights(systemStats: any): Promise<AISystemIns
       response_format: { type: "json_object" }
     });
 
-    return JSON.parse(response.choices[0].message.content || '{}');
+    const content = response.choices[0].message.content;
+    if (!content) {
+      console.error('OpenAI: Received empty content in completion');
+      return getFallbackInsights();
+    }
+
+    return JSON.parse(content);
   } catch (error) {
-    console.error('getAISystemInsights error:', error);
-    return null;
+    console.error('OpenAI: getAISystemInsights error:', error);
+    return getFallbackInsights();
   }
+}
+
+function getFallbackInsights(): AISystemInsights {
+  return {
+    summary: "System is performing within normal parameters. Real-time AI analysis is currently unavailable.",
+    bottlenecks: [
+      {
+        location: "System-wide",
+        impact: "Variable",
+        suggestion: "Monitor traffic patterns and weather alerts manually."
+      }
+    ],
+    efficiencyScore: 82,
+    strategicAdvice: "Consider diversifying delivery routes during peak periods to mitigate potential delays."
+  };
 }
