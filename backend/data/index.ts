@@ -246,17 +246,37 @@ export const DataStore = {
   },
 
   dismissAlert: async (id: string): Promise<boolean> => {
+    // Try to dismiss from both sources
+    let supabaseResult = false;
     if (isSupabaseConfigured()) {
-      return SupabaseStore.dismissAlert(id);
+      try {
+        supabaseResult = await SupabaseStore.dismissAlert(id);
+      } catch (error) {
+        console.warn('Supabase dismissAlert failed:', error);
+      }
     }
-    return MemoryStore.dismissAlert(id);
+
+    // Always call memory store as fallback or concurrent source
+    const memoryResult = MemoryStore.dismissAlert(id);
+
+    // Return true if either succeeded (or if it's already gone)
+    return supabaseResult || memoryResult;
   },
 
   markAlertAsRead: async (id: string): Promise<boolean> => {
+    // Try to mark in both sources
+    let supabaseResult = false;
     if (isSupabaseConfigured()) {
-      return SupabaseStore.markAlertAsRead(id);
+      try {
+        supabaseResult = await SupabaseStore.markAlertAsRead(id);
+      } catch (error) {
+        console.warn('Supabase markAlertAsRead failed:', error);
+      }
     }
-    return MemoryStore.markAlertAsRead(id);
+
+    const memoryResult = MemoryStore.markAlertAsRead(id);
+
+    return supabaseResult || memoryResult;
   },
 
   // Analytics
