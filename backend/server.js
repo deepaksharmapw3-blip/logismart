@@ -23,6 +23,31 @@ dotenv_1.default.config();
 // Create Express app
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
+const defaultAllowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://supplysense1.netlify.app',
+];
+const allowedOrigins = Array.from(new Set([
+    ...defaultAllowedOrigins,
+    ...(process.env.FRONTEND_URL || '')
+        .split(',')
+        .map(origin => origin.trim())
+        .filter(Boolean),
+]));
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204,
+};
 // Middleware
 app.use((0, helmet_1.default)({
     contentSecurityPolicy: {
@@ -40,18 +65,8 @@ app.use((0, helmet_1.default)({
         },
     },
 }));
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',');
-app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        }
-        else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-}));
+app.use((0, cors_1.default)(corsOptions));
+app.options('*', (0, cors_1.default)(corsOptions));
 app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
