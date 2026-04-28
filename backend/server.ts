@@ -33,7 +33,7 @@ const allowedOrigins = Array.from(new Set([
   ...defaultAllowedOrigins,
   ...(process.env.FRONTEND_URL || '')
     .split(',')
-    .map(origin => origin.trim())
+    .map(origin => origin.trim().replace(/\/+$/, ''))
     .filter(Boolean),
 ]));
 
