@@ -7,6 +7,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import fs from 'fs';
 
 // Import routes
 import shipmentsRouter from './routes/shipments';
@@ -125,9 +126,18 @@ app.get('/debug/status', async (req: Request, res: Response) => {
 });
 
 // Serve frontend static files (production build)
-app.get("/", (req, res) => {
-  res.json({ message: "Backend is running 🚀" });
-});
+const frontendDist = path.resolve(__dirname, '../dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get(/^(?!\/api|\/health|\/debug).*/, (req: Request, res: Response) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+} else {
+  app.get('/', (req: Request, res: Response) => {
+    res.json({ message: 'Backend is running 🚀' });
+  });
+}
+
 // Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', err);
