@@ -24,6 +24,7 @@ import MemoryStore from './data/store';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const defaultAllowedOrigins = [
+  'http://localhost:5000',
   'http://localhost:5173',
   'http://localhost:3000',
   'https://supplysense1.netlify.app',
@@ -35,9 +36,27 @@ const allowedOrigins = Array.from(new Set([
     .map(origin => origin.trim())
     .filter(Boolean),
 ]));
+
+// Allow any Replit preview/deployment domain so the app works behind the
+// Replit proxy without manual configuration.
+const isAllowedOrigin = (origin: string): boolean => {
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+    if (hostname.endsWith('.replit.dev')) return true;
+    if (hostname.endsWith('.replit.app')) return true;
+    if (hostname.endsWith('.repl.co')) return true;
+    if (hostname.endsWith('.pike.replit.dev')) return true;
+  } catch {
+    // ignore parse errors, fall through to deny
+  }
+  return false;
+};
+
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || isAllowedOrigin(origin)) {
       callback(null, true);
       return;
     }
