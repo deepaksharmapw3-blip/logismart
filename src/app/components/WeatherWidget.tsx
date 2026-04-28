@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Cloud, Sun, Wind, Droplets, Eye, Thermometer } from 'lucide-react';
+import { api } from '../services/api';
 
 interface WeatherData {
   temperature: number;
@@ -19,8 +20,6 @@ interface WeatherWidgetProps {
   lon: number;
 }
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
-
 export function WeatherWidget({ lat, lon }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,17 +27,11 @@ export function WeatherWidget({ lat, lon }: WeatherWidgetProps) {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/weather/current?lat=${lat}&lon=${lon}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setWeather(data.data);
-          }
-        }
+        const data = await api.getCurrentWeather(lat, lon);
+        setWeather(data);
       } catch (error) {
         console.error('Failed to fetch weather:', error);
+        setWeather(null);
       } finally {
         setLoading(false);
       }
