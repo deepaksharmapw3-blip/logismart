@@ -422,7 +422,7 @@ export default function App() {
 
         {activeTab === "ai-consultant" && (
           <div>
-            <AIConsultant />
+            <AIConsultant onConfirmExecution={handleApplyRoute} />
           </div>
         )}
       </main>

@@ -26,12 +26,18 @@ interface ShipmentOptimization {
     decision: AIDecision | null;
 }
 
-export function AIConsultant() {
+interface AIConsultantProps {
+    onConfirmExecution?: (shipmentId: string) => Promise<void>;
+}
+
+export function AIConsultant({ onConfirmExecution }: AIConsultantProps) {
     const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
     const [insights, setInsights] = useState<AISystemInsights | null>(null);
     const [shipmentOptimizations, setShipmentOptimizations] = useState<ShipmentOptimization[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState<'strategic' | 'shipments'>('strategic');
+    const [executingShipmentId, setExecutingShipmentId] = useState<string | null>(null);
+    const [executedShipments, setExecutedShipments] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,6 +74,22 @@ export function AIConsultant() {
         };
         fetchData();
     }, []);
+
+    const handleConfirmExecution = async (shipmentId: string) => {
+        if (!onConfirmExecution || executingShipmentId) {
+            return;
+        }
+
+        try {
+            setExecutingShipmentId(shipmentId);
+            await onConfirmExecution(shipmentId);
+            setExecutedShipments(prev => new Set(prev).add(shipmentId));
+        } catch (error) {
+            console.error('Error confirming shipment optimization:', error);
+        } finally {
+            setExecutingShipmentId(null);
+        }
+    };
 
     if (loading) {
         return (
@@ -359,8 +381,16 @@ export function AIConsultant() {
                                             </div>
 
                                             <div className="flex gap-4">
-                                                <Button className="flex-1 btn-glass h-14 rounded-2xl font-black text-sm tracking-widest uppercase shadow-xl hover:shadow-indigo-500/20">
-                                                    Confirm Execution
+                                                <Button
+                                                    onClick={() => handleConfirmExecution(opt.shipment.id)}
+                                                    disabled={!onConfirmExecution || executingShipmentId === opt.shipment.id || executedShipments.has(opt.shipment.id)}
+                                                    className="flex-1 btn-glass h-14 rounded-2xl font-black text-sm tracking-widest uppercase shadow-xl hover:shadow-indigo-500/20 disabled:opacity-60"
+                                                >
+                                                    {executingShipmentId === opt.shipment.id
+                                                        ? 'Executing...'
+                                                        : executedShipments.has(opt.shipment.id)
+                                                            ? 'Execution Confirmed'
+                                                            : 'Confirm Execution'}
                                                 </Button>
                                                 <Button variant="ghost" className="h-14 w-14 rounded-2xl border border-white/10 hover:bg-white/5">
                                                     <Info className="w-5 h-5" />
