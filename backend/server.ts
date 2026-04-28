@@ -48,6 +48,9 @@ const isAllowedOrigin = (origin: string): boolean => {
     if (hostname.endsWith('.replit.app')) return true;
     if (hostname.endsWith('.repl.co')) return true;
     if (hostname.endsWith('.pike.replit.dev')) return true;
+    if (hostname.endsWith('.netlify.app')) return true;
+    if (hostname.endsWith('.onrender.com')) return true;
+    if (hostname.endsWith('.vercel.app')) return true;
   } catch {
     // ignore parse errors, fall through to deny
   }

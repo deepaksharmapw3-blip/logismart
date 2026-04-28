@@ -1,0 +1,19 @@
+Access to fetch at 'https://logismart-5.onrender.com/api/predictions' from origin 'https://jazzy-dasik-464fdb.netlify.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+logismart-5.onrender.com/api/predictions:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+index-CAyiHAjZ.js:311 Error fetching data: TypeError: Failed to fetch
+    at ot (index-CAyiHAjZ.js:48:30280)
+    at Object.getPredictions (index-CAyiHAjZ.js:48:30888)
+    at j (index-CAyiHAjZ.js:311:101532)
+    at index-CAyiHAjZ.js:311:102069
+    at cc (index-CAyiHAjZ.js:40:24490)
+    at Za (index-CAyiHAjZ.js:40:42970)
+    at index-CAyiHAjZ.js:40:41202
+    at O (index-CAyiHAjZ.js:25:1598)
+    at MessagePort.D (index-CAyiHAjZ.js:25:1964)
+j @ index-CAyiHAjZ.js:311Understand this error
+(index):1 Access to fetch at 'https://logismart-5.onrender.com/api/shipments' from origin 'https://jazzy-dasik-464fdb.netlify.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+logismart-5.onrender.com/api/shipments:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+(index):1 Access to fetch at 'https://logismart-5.onrender.com/api/routes/optimizations' from origin 'https://jazzy-dasik-464fdb.netlify.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+logismart-5.onrender.com/api/routes/optimizations:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+(index):1 Access to fetch at 'https://logismart-5.onrender.com/api/alerts' from origin 'https://jazzy-dasik-464fdb.netlify.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+logismart-5.onrender.com/api/alerts:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
