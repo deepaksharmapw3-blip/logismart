@@ -16,21 +16,37 @@ exports.getCurrentWeather = getCurrentWeather;
 exports.getWeatherForecast = getWeatherForecast;
 exports.calculateWeatherImpact = calculateWeatherImpact;
 const axios_1 = __importDefault(require("axios"));
-const API_KEY = process.env.OPENWEATHER_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
+function getApiKey() {
+    return process.env.OPENWEATHER_API_KEY;
+}
+function createFallbackWeather(lat, lon) {
+    return {
+        temperature: 28,
+        feelsLike: 31,
+        humidity: 65,
+        description: 'Weather service temporarily unavailable',
+        icon: '01d',
+        windSpeed: 4,
+        visibility: 8000,
+        location: `${lat.toFixed(2)},${lon.toFixed(2)}`,
+        coordinates: { lat, lon },
+    };
+}
 function getCurrentWeather(lat, lon) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c;
-        if (!API_KEY) {
+        const apiKey = getApiKey();
+        if (!apiKey) {
             console.warn('OpenWeather API key not configured');
-            return null;
+            return createFallbackWeather(lat, lon);
         }
         try {
             const response = yield axios_1.default.get(`${BASE_URL}/weather`, {
                 params: {
                     lat,
                     lon,
-                    appid: API_KEY,
+                    appid: apiKey,
                     units: 'metric',
                 },
             });
@@ -49,22 +65,23 @@ function getCurrentWeather(lat, lon) {
         }
         catch (error) {
             console.error('Weather API error:', error);
-            return null;
+            return createFallbackWeather(lat, lon);
         }
     });
 }
 function getWeatherForecast(lat, lon) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!API_KEY) {
+        const apiKey = getApiKey();
+        if (!apiKey) {
             console.warn('OpenWeather API key not configured');
-            return null;
+            return Array.from({ length: 5 }, () => createFallbackWeather(lat, lon));
         }
         try {
             const response = yield axios_1.default.get(`${BASE_URL}/forecast`, {
                 params: {
                     lat,
                     lon,
-                    appid: API_KEY,
+                    appid: apiKey,
                     units: 'metric',
                 },
             });
@@ -85,7 +102,7 @@ function getWeatherForecast(lat, lon) {
         }
         catch (error) {
             console.error('Weather forecast API error:', error);
-            return null;
+            return Array.from({ length: 5 }, () => createFallbackWeather(lat, lon));
         }
     });
 }
